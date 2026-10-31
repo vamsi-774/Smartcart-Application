@@ -602,6 +602,304 @@ def admin_profile_update():
     return redirect('/admin/profile')
 
 
+# =========================USER====================================
+# ⭐ ROUTE 1: User Registration (GET + POST)
+# =================================================================
+# ROUTE: USER REGISTRATION
+# =================================================================
+@app.route('/user-register', methods=['GET', 'POST'])
+def user_register():
+
+    if request.method == 'GET':
+        return render_template("user/user_register.html")
+
+    name = request.form['name']
+    email = request.form['email']
+    password = request.form['password']
+
+    # Check if user already exists
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+    existing_user = cursor.fetchone()
+
+    if existing_user:
+        flash("Email already registered! Please login.", "danger")
+        return redirect('/user-register')
+
+    # Hash password
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+    # Insert new user
+    cursor.execute(
+        "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
+        (name, email, hashed_password)
+    )
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    flash("Registration successful! Please login.", "success")
+    return redirect('/user-login')
+
+# ⭐ ROUTE 2: User Login (GET + POST)
+# =================================================================
+# ROUTE: USER LOGIN
+# =================================================================
+@app.route('/user-login', methods=['GET', 'POST'])
+def user_login():
+
+    if request.method == 'GET':
+        return render_template("user/user_login.html")
+
+    email = request.form['email']
+    password = request.form['password']
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+    user = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not user:
+        flash("Email not found! Please register.", "danger")
+        return redirect('/user-login')
+
+    # Verify password
+    if not bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+        flash("Incorrect password!", "danger")
+        return redirect('/user-login')
+
+    # Create user session
+    session['user_id'] = user['user_id']
+    session['user_name'] = user['name']
+    session['user_email'] = user['email']
+
+    flash("Login successful!", "success")
+    return redirect('/user-dashboard')
+
+# ⭐ ROUTE 3: User Dashboard (Protected)
+# =================================================================
+# ROUTE: USER DASHBOARD
+# =================================================================
+@app.route('/user-dashboard')
+def user_dashboard():
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
+    return render_template("user/user_home.html", user_name=session['user_name'])
+
+# ⭐ ROUTE 4: User Logout
+# =================================================================
+# ROUTE: USER LOGOUT
+# =================================================================
+@app.route('/user-logout')
+def user_logout():
+    
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    session.pop('user_email', None)
+
+    flash("Logged out successfully!", "success")
+    return redirect('/user-login')
+
+# ⭐ ROUTE 5: Display All Products for Users
+# =================================================================
+# ROUTE: USER PRODUCT LISTING (SEARCH + FILTER)
+# =================================================================
+@app.route('/user/products')
+def user_products():
+
+    # Optional: restrict only logged-in users
+    if 'user_id' not in session:
+        flash("Please login to view products!", "danger")
+        return redirect('/user-login')
+
+    search = request.args.get('search', '')
+    category_filter = request.args.get('category', '')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Fetch categories for filter dropdown
+    cursor.execute("SELECT DISTINCT category FROM products")
+    categories = cursor.fetchall()
+
+    # Build dynamic SQL
+    query = "SELECT * FROM products WHERE 1=1"
+    params = []
+
+    if search:
+        query += " AND name LIKE %s"
+        params.append("%" + search + "%")
+
+    if category_filter:
+        query += " AND category = %s"
+        params.append(category_filter)
+
+    cursor.execute(query, params)
+    products = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "user/user_products.html",
+        products=products,
+        categories=categories
+    )
+
+# ⭐ ROUTE 6: Single Product Details Page
+# =================================================================
+# ROUTE: USER PRODUCT DETAILS PAGE
+# =================================================================
+@app.route('/user/product/<int:product_id>')
+def user_product_details(product_id):
+
+    if 'user_id' not in session:
+        flash("Please login!", "danger")
+        return redirect('/user-login')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM products WHERE product_id = %s", (product_id,))
+    product = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not product:
+        flash("Product not found!", "danger")
+        return redirect('/user/products')
+
+    return render_template("user/product_details.html", product=product)
+
+# ⭐ ROUTE 7: Add to Cart
+# =================================================================
+# ADD ITEM TO CART
+# =================================================================
+@app.route('/user/add-to-cart/<int:product_id>')
+def add_to_cart(product_id):
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
+    # Create cart if doesn't exist
+    if 'cart' not in session:
+        session['cart'] = {}
+
+    cart = session['cart']
+
+    # Get product
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE product_id=%s", (product_id,))
+    product = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not product:
+        flash("Product not found.", "danger")
+        return redirect(request.referrer)
+
+    pid = str(product_id)
+
+    # If exists → increase quantity
+    if pid in cart:
+        cart[pid]['quantity'] += 1
+    else:
+        cart[pid] = {
+            'name': product['name'],
+            'price': float(product['price']),
+            'image': product['image'],
+            'quantity': 1
+        }
+
+    session['cart'] = cart
+
+    flash("Item added to cart!", "success")
+    # return redirect('/user/cart')    instead of this line use below line
+    return redirect(request.referrer)   # ⭐ Return to same page
+# ⭐ ROUTE 7: View Cart Page
+# =================================================================
+# VIEW CART PAGE
+# =================================================================
+@app.route('/user/cart')
+def view_cart():
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
+    cart = session.get('cart', {})
+
+    # Calculate total
+    grand_total = sum(item['price'] * item['quantity'] for item in cart.values())
+
+    return render_template("user/cart.html", cart=cart, grand_total=grand_total)
+
+# ⭐ ROUTE 8: Increase Quantity
+# =================================================================
+# INCREASE QUANTITY
+# =================================================================
+@app.route('/user/cart/increase/<pid>')
+def increase_quantity(pid):
+
+    cart = session.get('cart', {})
+
+    if pid in cart:
+        cart[pid]['quantity'] += 1
+
+    session['cart'] = cart
+    return redirect('/user/cart')
+
+# ⭐ ROUTE 9: Decrease Quantity
+# =================================================================
+# DECREASE QUANTITY
+# =================================================================
+@app.route('/user/cart/decrease/<pid>')
+def decrease_quantity(pid):
+
+    cart = session.get('cart', {})
+
+    if pid in cart:
+        cart[pid]['quantity'] -= 1
+
+        # If quantity becomes 0 → remove item
+        if cart[pid]['quantity'] <= 0:
+            cart.pop(pid)
+
+    session['cart'] = cart
+    return redirect('/user/cart')
+
+# ⭐ ROUTE 10: Remove Item Completely
+# =================================================================
+# REMOVE ITEM
+# =================================================================
+@app.route('/user/cart/remove/<pid>')
+def remove_from_cart(pid):
+
+    cart = session.get('cart', {})
+
+    if pid in cart:
+        cart.pop(pid)
+
+    session['cart'] = cart
+
+    flash("Item removed!", "success")
+    return redirect('/user/cart')
+
+
+
 # ------------------------ RUN SERVER -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
