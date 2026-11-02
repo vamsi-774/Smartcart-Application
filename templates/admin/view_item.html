@@ -1,24 +1,335 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Product Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #986342;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1100px;
+            margin: 55px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 29px;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #888888;
+            font-size: 14px;
+        }
+
+        /* Product Card */
+        .product-card {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 45px;
+            background: #FFFFFF;
+            padding: 35px;
+            border: 1px solid #EDE6DC;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(80, 60, 40, 0.07);
+        }
+
+        /* Product Image */
+        .image-section {
+            background: #FAF8F3;
+            border: 1px solid #F0EAE2;
+            border-radius: 13px;
+            min-height: 380px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 350px;
+            height: 350px;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.04);
+        }
+
+        /* Product Information */
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            width: fit-content;
+            background: #F8F1EA;
+            color: #986342;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .product-name {
+            font-size: 29px;
+            color: #4A3F35;
+            line-height: 1.4;
+            margin-bottom: 18px;
+        }
+
+        .price-label {
+            font-size: 13px;
+            color: #888888;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            font-size: 30px;
+            color: #B77B55;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #EDE6DC;
+            margin-bottom: 22px;
+        }
+
+        .description-heading {
+            font-size: 17px;
+            color: #4A3F35;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            font-size: 15px;
+            color: #777777;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            overflow-wrap: anywhere;
+        }
+
+        .back-link {
+            display: inline-block;
+            width: fit-content;
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 13px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 15px;
+            color: #999999;
+            font-size: 13px;
+            margin-top: 35px;
+        }
+
+        /* Responsive */
+        @media (max-width: 750px) {
+            .product-card {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                padding: 22px;
+            }
+
+            .image-section {
+                min-height: 280px;
+            }
+
+            .product-image {
+                height: 260px;
+            }
+
+            .product-name {
+                font-size: 24px;
+            }
+
+            .product-price {
+                font-size: 26px;
+            }
+
+            .main-container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .page-heading h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>Product Details</h2>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
 
-    <img src="/static/uploads/product_images/{{ product.image }}" width="200"><br><br>
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    <p><strong>Name:</strong> {{ product.name }}</p>
-    <p><strong>Description:</strong> {{ product.description }}</p>
-    <p><strong>Category:</strong> {{ product.category }}</p>
-    <p><strong>Price:</strong> ₹{{ product.price }}</p>
+        <a href="/admin/item-list" class="back-btn">
+            ← Back to Products
+        </a>
 
-    <br>
-    <a href="/admin/item-list">Back to List</a>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <div class="page-heading">
+            <h1>Product Details</h1>
+            <p>View complete information about your product.</p>
+        </div>
+
+
+        <div class="product-card">
+
+            <!-- Product Image -->
+            <div class="image-section">
+
+                <img
+                    src="/static/uploads/product_images/{{ product.image }}"
+                    alt="{{ product.name }}"
+                    class="product-image">
+
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="details-section">
+
+                <span class="category-badge">
+                    {{ product.category }}
+                </span>
+
+                <h2 class="product-name">
+                    {{ product.name }}
+                </h2>
+
+                <p class="price-label">Product Price</p>
+
+                <p class="product-price">
+                    ₹{{ "%.2f"|format(product.price|float) }}
+                </p>
+
+                <hr class="divider">
+
+                <h3 class="description-heading">
+                    Product Description
+                </h3>
+
+                <p class="product-description">
+                    {{ product.description }}
+                </p>
+
+                <a href="/admin/item-list" class="back-link">
+                    ← Back to Product List
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
 
 </body>
-
 </html>

@@ -1,47 +1,391 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Update Product</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+            color: #4A3F35;
+        }
+
+        .update-container {
+            width: 100%;
+            max-width: 600px;
+            background: #FFFFFF;
+            padding: 40px;
+            border-radius: 18px;
+            border: 1px solid #EDE6DC;
+            box-shadow: 0 12px 40px rgba(80, 60, 40, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 34px;
+            font-weight: 800;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 28px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A3F35;
+            margin-bottom: 9px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            background: #FFFEFC;
+            font-size: 14px;
+            color: #333333;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #AAAAAA;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        /* Existing Product Image */
+        .image-preview {
+            background: #FAF8F3;
+            border: 1px solid #EDE6DC;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .product-image {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .image-info {
+            font-size: 13px;
+            color: #888888;
+            line-height: 1.7;
+        }
+
+        .image-info strong {
+            color: #4A3F35;
+            display: block;
+            font-size: 14px;
+        }
+
+        /* File Upload */
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            background: #FDFBF8;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #F8F1EA;
+            color: #986342;
+            border: 1px solid #D9B49A;
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #F0E3D7;
+        }
+
+        .file-note {
+            font-size: 12px;
+            color: #999999;
+            margin-top: 7px;
+        }
+
+        /* Buttons */
+        .update-btn {
+            width: 100%;
+            padding: 14px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+        }
+
+        .update-btn:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            color: #B77B55;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #986342;
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 13px;
+            color: #999999;
+        }
+
+        /* Responsive */
+        @media (max-width: 550px) {
+            .update-container {
+                padding: 30px 22px;
+            }
+
+            .logo {
+                font-size: 30px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .image-preview {
+                gap: 12px;
+            }
+
+            .product-image {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>Update Product</h2>
+    <div class="update-container">
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:green;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
+        <h1 class="logo">Smart <span>Cart</span></h1>
 
-    <form method="POST" action="/admin/update-item/{{ product.product_id }}" enctype="multipart/form-data">
+        <p class="subtitle">
+            Your Shopping Experience, Made Smarter.
+        </p>
 
-        <label>Product Name:</label><br>
-        <input type="text" name="name" value="{{ product.name }}" required><br><br>
+        <h2>Update Product</h2>
 
-        <label>Description:</label><br>
-        <textarea name="description" required>{{ product.description }}</textarea><br><br>
+        <p class="description">
+            Modify your product information and update its image.
+        </p>
 
-        <label>Category:</label><br>
-        <input type="text" name="category" value="{{ product.category }}" required><br><br>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
 
-        <label>Price:</label><br>
-        <input type="number" step="0.01" name="price" value="{{ product.price }}" required><br><br>
+        <form method="POST"
+              action="/admin/update-item/{{ product.product_id }}"
+              enctype="multipart/form-data">
 
-        <label>Old Image:</label><br>
-        <img src="/static/uploads/product_images/{{ product.image }}" width="120"><br><br>
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ product.name }}"
+                    placeholder="Enter product name"
+                    required>
+            </div>
 
-        <label>Choose New Image (Optional):</label><br>
-        <input type="file" name="image" accept="image/*"><br><br>
+            <div class="form-group">
+                <label for="description">Product Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Enter product description"
+                    required>{{ product.description }}</textarea>
+            </div>
 
-        <button type="submit">Update Product</button>
-    </form>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input
+                    type="text"
+                    id="category"
+                    name="category"
+                    value="{{ product.category }}"
+                    placeholder="Enter product category"
+                    required>
+            </div>
 
-    <br>
-    <a href="/admin/item-list">Back to Product List</a>
+            <div class="form-group">
+                <label for="price">Price (₹)</label>
+                <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    step="0.01"
+                    min="0"
+                    value="{{ product.price }}"
+                    placeholder="Enter product price"
+                    required>
+            </div>
+
+            <!-- Existing Image -->
+            <div class="form-group">
+
+                <label>Current Product Image</label>
+
+                <div class="image-preview">
+
+                    <img
+                        src="/static/uploads/product_images/{{ product.image }}"
+                        alt="{{ product.name }}"
+                        class="product-image">
+
+                    <div class="image-info">
+                        <strong>Current Image</strong>
+                        Your existing product image is displayed here.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- New Image Upload -->
+            <div class="form-group">
+
+                <label for="image">
+                    Choose New Image (Optional)
+                </label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*">
+
+                <p class="file-note">
+                    Leave this field empty to keep the existing image.
+                </p>
+
+            </div>
+
+            <button type="submit" class="update-btn">
+                Update Product
+            </button>
+
+        </form>
+
+        <a href="/admin/item-list" class="back-link">
+            ← Back to Product List
+        </a>
+
+        <div class="footer">
+            © 2026 Smart Cart. All Rights Reserved.
+        </div>
+
+    </div>
 
 </body>
-
 </html>

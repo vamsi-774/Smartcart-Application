@@ -6,6 +6,8 @@ import random
 import config
 import os
 from werkzeug.utils import secure_filename
+import razorpay
+
 
 
 
@@ -36,7 +38,13 @@ def get_db_connection():
         database=config.DB_NAME
     )
 
+# =======================================
+# Flask 1st Route
+# =======================================
 
+@app.route('/')
+def home():
+    return render_template('index.html')
 # ---------------------------------------------------------
 # ROUTE 1: ADMIN SIGNUP (SEND OTP)
 # ---------------------------------------------------------
@@ -277,6 +285,7 @@ def add_item():
 # =================================================================
 # ROUTE 9: DISPLAY ALL PRODUCTS (Admin)
 # =================================================================
+
 @app.route('/admin/item-list')
 def item_list():
 
@@ -285,16 +294,52 @@ def item_list():
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
+    # Get search and category values from URL
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM products")
+    # Base query
+    query = "SELECT * FROM products WHERE 1=1"
+    values = []
+
+    # Search by product name
+    if search:
+        query += " AND name LIKE %s"
+        values.append(f"%{search}%")
+
+    # Filter by category
+    if category:
+        query += " AND category = %s"
+        values.append(category)
+
+    # Execute final query
+    query += " ORDER BY product_id DESC"
+
+    cursor.execute(query, tuple(values))
     products = cursor.fetchall()
+
+    # Get all available categories dynamically
+    cursor.execute("""
+        SELECT DISTINCT category
+        FROM products
+        WHERE category IS NOT NULL AND category != ''
+        ORDER BY category
+    """)
+
+    categories = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-    return render_template("admin/item_list.html", products=products)
+    return render_template(
+        "admin/item_list.html",
+        products=products,
+        categories=categories
+    )
+
 
 
 
@@ -327,29 +372,99 @@ def view_item(item_id):
 # =================================================================
 # ROUTE 11: SHOW UPDATE FORM WITH EXISTING DATA
 # =================================================================
-@app.route('/admin/update-item/<int:item_id>', methods=['GET'])
+
+@app.route('/admin/update-item/<int:item_id>', methods=['GET', 'POST'])
 def update_item_page(item_id):
 
-    # Check login
+    # Check admin login
     if 'admin_id' not in session:
         flash("Please login!", "danger")
         return redirect('/admin-login')
 
-    # Fetch product data
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM products WHERE product_id = %s", (item_id,))
+    # Fetch existing product
+    cursor.execute(
+        "SELECT * FROM products WHERE product_id = %s",
+        (item_id,)
+    )
+
     product = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
-
     if not product:
+        cursor.close()
+        conn.close()
         flash("Product not found!", "danger")
         return redirect('/admin/item-list')
 
-    return render_template("admin/update_item.html", product=product)
+    # Handle POST request
+    if request.method == 'POST':
+
+        name = request.form['name']
+        description = request.form['description']
+        category = request.form['category']
+        price = request.form['price']
+
+        # Keep existing image by default
+        image = product['image']
+
+        # Check if a new image is uploaded
+        file = request.files.get('image')
+
+        if file and file.filename:
+
+            filename = secure_filename(file.filename)
+
+            upload_folder = os.path.join(
+                app.root_path,
+                'static',
+                'uploads',
+                'product_images'
+            )
+
+            os.makedirs(upload_folder, exist_ok=True)
+
+            file.save(os.path.join(upload_folder, filename))
+
+            image = filename
+
+        # Update product in database
+        cursor.execute("""
+            UPDATE products
+            SET name = %s,
+                description = %s,
+                category = %s,
+                price = %s,
+                image = %s
+            WHERE product_id = %s
+        """, (
+            name,
+            description,
+            category,
+            price,
+            image,
+            item_id
+        ))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        flash("Product updated successfully!", "success")
+
+        return redirect('/admin/item-list')
+
+    # Display update page
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "admin/update_item.html",
+        product=product
+    )
+
 # =================================================================
 # ROUTE-12: UPDATE PRODUCT + OPTIONAL IMAGE REPLACE
 # =================================================================
@@ -687,6 +802,8 @@ def user_login():
 # =================================================================
 # ROUTE: USER DASHBOARD
 # =================================================================
+
+
 @app.route('/user-dashboard')
 def user_dashboard():
 
@@ -694,7 +811,19 @@ def user_dashboard():
         flash("Please login first!", "danger")
         return redirect('/user-login')
 
-    return render_template("user/user_home.html", user_name=session['user_name'])
+    # Get cart items from session
+    cart = session.get('cart', [])
+
+    # Count distinct products in cart
+    cart_count = len(cart)
+
+    return render_template(
+        "user/user_home.html",
+        user_name=session['user_name'],
+        cart_count=cart_count
+    )
+
+
 
 # ⭐ ROUTE 4: User Logout
 # =================================================================
@@ -898,6 +1027,163 @@ def remove_from_cart(pid):
     flash("Item removed!", "success")
     return redirect('/user/cart')
 
+# ====================================================================
+# Route 11: User Address
+# ====================================================================
+@app.route('/user/address', methods=['GET', 'POST'])
+def user_address():
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
+    if request.method == 'POST':
+
+        selected_ids = request.form.getlist('selected_products')
+
+        cart = session.get('cart', {})
+
+        selected_ids = [
+            pid for pid in selected_ids
+            if str(pid) in cart
+        ]
+
+        if not selected_ids:
+            flash("Please select at least one product!", "warning")
+            return redirect('/user/cart')
+
+        session['selected_products'] = selected_ids
+
+        return redirect('/user/address')
+
+    if not session.get('selected_products'):
+        flash("Please select products from your cart!", "warning")
+        return redirect('/user/cart')
+
+    return render_template("user/address.html")
+
+
+# =========================================
+# Route 12: Order Review
+# =========================================
+@app.route('/user/order-review', methods=['POST'])
+def order_review():
+
+    # Check user login
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
+    # Get address details
+    full_name = request.form.get('full_name')
+    mobile = request.form.get('mobile')
+    address = request.form.get('address')
+    pincode = request.form.get('pincode')
+
+    # Validate address
+    if not all([full_name, mobile, address, pincode]):
+        flash("Please fill all address details!", "danger")
+        return redirect('/user/address')
+
+    # Get cart from session
+    cart = session.get('cart', {})
+
+    # Get selected product IDs
+    selected_ids = session.get('selected_products', [])
+
+    if not cart or not selected_ids:
+        flash("Please select products before checkout!", "danger")
+        return redirect('/user/cart')
+
+    # Prepare selected order items
+    order_items = []
+    grand_total = 0
+
+    for pid in selected_ids:
+
+        item = cart.get(str(pid))
+
+        if item:
+
+            price = float(item['price'])
+            quantity = int(item['quantity'])
+
+            item_total = price * quantity
+
+            order_items.append({
+                'product_id': pid,
+                'name': item['name'],
+                'image': item['image'],
+                'price': price,
+                'quantity': quantity,
+                'total': item_total
+            })
+
+            grand_total += item_total
+
+    if not order_items:
+        flash("No valid products selected!", "danger")
+        return redirect('/user/cart')
+
+    # Save delivery address in session
+    session['delivery_address'] = {
+        'full_name': full_name,
+        'mobile': mobile,
+        'address': address,
+        'pincode': pincode
+    }
+
+    return render_template(
+        "user/order_review.html",
+        order_items=order_items,
+        grand_total=grand_total,
+        delivery=session['delivery_address']
+    )
+
+
+
+# =================================================================
+# ROUTE: CREATE RAZORPAY ORDER
+# =================================================================
+razorpay_client = razorpay.Client(
+    auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
+)
+
+# =================================================================
+# ROUTE: CREATE RAZORPAY ORDER
+# =================================================================
+@app.route('/user/pay' , methods=['POST'])
+def user_pay():
+
+    if 'user_id' not in session:
+        flash("Please login!", "danger")
+        return redirect('/user-login')
+
+    cart = session.get('cart', {})
+
+    if not cart:
+        flash("Your cart is empty!", "danger")
+        return redirect('/user/products')
+
+    # Calculate total amount
+    total_amount = sum(item['price'] * item['quantity'] for item in cart.values())
+    razorpay_amount = int(total_amount * 100)  # convert to paise
+
+    # Create Razorpay order
+    razorpay_order = razorpay_client.order.create({
+        "amount": razorpay_amount,
+        "currency": "INR",
+        "payment_capture": "1"
+    })
+
+    session['razorpay_order_id'] = razorpay_order['id']
+
+    return render_template(
+        "user/payment.html",
+        amount=total_amount,
+        key_id=config.RAZORPAY_KEY_ID,
+        order_id=razorpay_order['id']
+    )
 
 
 # ------------------------ RUN SERVER -----------------------

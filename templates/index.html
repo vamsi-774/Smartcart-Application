@@ -1,13 +1,187 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Smart Cart | Home</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            text-align: center;
+            padding: 65px 35px;
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(80, 60, 40, 0.08);
+        }
+
+        .logo {
+            font-size: 45px;
+            font-weight: 800;
+            color: #4A3F35;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: #777777;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            display: inline-block;
+            font-size: 13px;
+            color: #56805B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+            padding: 9px 17px;
+            border-radius: 30px;
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: #4A3F35;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 14px 22px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 175px;
+        }
+
+        .admin-btn {
+            background: #FFFFFF;
+            color: #8A6348;
+            border: 1px solid #CDA98E;
+        }
+
+        .user-btn {
+            background: #B77B55;
+            color: #FFFFFF;
+            border: 1px solid #B77B55;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(100, 70, 40, 0.12);
+        }
+
+        .admin-btn:hover {
+            background: #F8F1EA;
+        }
+
+        .user-btn:hover {
+            background: #986342;
+        }
+
+        .footer {
+            margin-top: 45px;
+            font-size: 13px;
+            color: #999999;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 45px 20px;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Welcome to Smart Cart Application
-    </h1>
-    <p>Flask Project setup sucessful</p>
+
+    <div class="container">
+
+        <h1 class="logo">Smart <span>Cart</span></h1>
+
+        <p class="subtitle">
+            Your Shopping Experience, Made Smarter.
+        </p>
+
+        <div class="status">
+            ● Flask Project Setup Successful
+        </div>
+
+        <h3 class="section-title">
+            Get Started With Smart Cart
+        </h3>
+
+        <div class="button-group">
+
+            <a href="/admin-signup" class="btn admin-btn">
+                Admin Registration
+            </a>
+
+            <a href="/admin-login" class="btn admin-btn">
+                Admin Login
+            </a>
+
+            <a href="/user-register" class="btn user-btn">
+                User Registration
+            </a>
+
+            <a href="/user-login" class="btn user-btn">
+                User Login
+            </a>
+
+        </div>
+
+        <div class="footer">
+            © 2026 Smart Cart Application. All Rights Reserved.
+        </div>
+
+    </div>
+
 </body>
 </html>

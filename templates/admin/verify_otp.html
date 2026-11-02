@@ -1,31 +1,224 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Verify OTP</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .verification-container {
+            width: 100%;
+            max-width: 450px;
+            background: #FFFFFF;
+            padding: 45px 38px;
+            border-radius: 20px;
+            border: 1px solid #EDE6DC;
+            box-shadow: 0 12px 40px rgba(80, 60, 40, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 35px;
+        }
+
+        h2 {
+            color: #4A3F35;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .description {
+            text-align: center;
+            color: #888888;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            color: #4A3F35;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            background: #FFFEFC;
+            font-size: 15px;
+            color: #333333;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        input::placeholder {
+            color: #AAAAAA;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        .flash-message {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .flash-message.error {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #999999;
+        }
+
+        @media (max-width: 480px) {
+            .verification-container {
+                padding: 35px 23px;
+            }
+
+            .logo {
+                font-size: 31px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>Verify OTP</h2>
+    <div class="verification-container">
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:red;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
+        <h1 class="logo">Smart <span>Cart</span></h1>
 
-    <form method="POST" action="/verify-otp">
+        <p class="subtitle">
+            Your Shopping Experience, Made Smarter.
+        </p>
 
-        <label>Enter OTP:</label><br>
-        <input type="text" name="otp" required><br><br>
+        <h2>Verify OTP</h2>
 
-        <label>Create Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <p class="description">
+            We've sent a verification code to your email.
+            Enter the OTP and create your password to complete registration.
+        </p>
 
-        <button type="submit">Verify & Register</button>
-    </form>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="/verify-otp">
+
+            <div class="form-group">
+                <label for="otp">Enter OTP</label>
+                <input
+                    type="text"
+                    id="otp"
+                    name="otp"
+                    placeholder="Enter your verification code"
+                    autocomplete="one-time-code"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Create Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a strong password"
+                    required>
+            </div>
+
+            <button type="submit">
+                Verify & Register
+            </button>
+
+        </form>
+
+        <div class="footer">
+            © 2026 Smart Cart. All Rights Reserved.
+        </div>
+
+    </div>
 
 </body>
-
 </html>

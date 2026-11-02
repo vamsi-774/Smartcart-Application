@@ -1,82 +1,555 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Products List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .add-btn {
+            text-decoration: none;
+            background: #B77B55;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #986342;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1250px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 30px;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #888888;
+            font-size: 14px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .flash-message.error {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        /* Filter Section */
+        .filter-card {
+            background: #FFFFFF;
+            padding: 25px;
+            border: 1px solid #EDE6DC;
+            border-radius: 13px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.04);
+            margin-bottom: 28px;
+        }
+
+        .filter-card h3 {
+            font-size: 17px;
+            margin-bottom: 18px;
+            color: #4A3F35;
+        }
+
+        .filter-form {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 220px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            background: #FFFEFC;
+            font-size: 14px;
+            outline: none;
+            color: #333333;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus,
+        select:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        select {
+            min-width: 190px;
+            padding: 13px 14px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            background: #FFFEFC;
+            color: #4A3F35;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-btn {
+            padding: 13px 23px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: #986342;
+        }
+
+        .clear-btn {
+            text-decoration: none;
+            padding: 12px 18px;
+            border: 1px solid #D9B49A;
+            color: #986342;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #F8F1EA;
+        }
+
+        /* Product Table */
+        .table-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 13px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.04);
+        }
+
+        .table-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 10px;
+        }
+
+        .table-heading h3 {
+            font-size: 19px;
+            color: #4A3F35;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        thead {
+            background: #F8F1EA;
+        }
+
+        th {
+            padding: 16px 14px;
+            text-align: left;
+            color: #4A3F35;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 1px solid #EDE6DC;
+        }
+
+        td {
+            padding: 16px 14px;
+            border-bottom: 1px solid #F0EAE2;
+            color: #666666;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #FFFCF8;
+        }
+
+        .product-image {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #FAF8F3;
+            padding: 5px;
+        }
+
+        .product-name {
+            color: #4A3F35;
+            font-weight: 600;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #F8F1EA;
+            color: #986342;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .price {
+            color: #B77B55;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .action-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .view-btn {
+            color: #986342;
+            background: #F8F1EA;
+            border: 1px solid #E5CBB8;
+        }
+
+        .view-btn:hover {
+            background: #F0E3D7;
+        }
+
+        .update-btn {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .update-btn:hover {
+            background: #DCEEDD;
+        }
+
+        .delete-btn {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        .delete-btn:hover {
+            background: #F7DAD6;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px 15px;
+            color: #999999;
+            font-size: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 15px;
+            color: #999999;
+            font-size: 13px;
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 650px) {
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .main-container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+
+            .page-heading h1 {
+                font-size: 25px;
+            }
+
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            select {
+                width: 100%;
+            }
+
+            .filter-btn,
+            .clear-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .filter-card,
+            .table-card {
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>Product List</h2>
+    <!-- Navbar -->
+    <nav class="navbar">
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:green;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    <!-- Search Form -->
-    <form method="GET" action="/admin/item-list">
-        <input type="text" name="search" placeholder="Search product..." value="{{ request.args.get('search', '') }}">
-        <button type="submit">Search</button>
-    </form>
+        <a href="/admin/add-item" class="add-btn">
+            + Add Product
+        </a>
 
-    <br>
+    </nav>
 
-    <!-- Category Filter -->
-    <form method="GET" action="/admin/item-list">
-        <select name="category">
-            <option value="">All Categories</option>
 
-            {% for cat in categories %}
-            <option value="{{ cat.category }}" {% if request.args.get('category')==cat.category %} selected {% endif %}>
-                {{ cat.category }}
-            </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Filter</button>
-    </form>
+    <main class="main-container">
 
-    <br>
+        <!-- Page Heading -->
+        <div class="page-heading">
+            <h1>Product List</h1>
+            <p>Manage, search and organize your store products.</p>
+        </div>
 
-    <a href="/admin/add-item">Add New Product</a>
-    <br><br>
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>ID</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>View</th>
-            <th>Delete</th>
-        </tr>
-
-        {% for product in products %}
-        <tr>
-            <td>{{ product.product_id }}</td>
-
-            <td>
-                <img src="/static/uploads/product_images/{{ product.image }}" width="70">
-            </td>
-
-            <td>{{ product.name }}</td>
-            <td>{{ product.category }}</td>
-            <td>₹{{ product.price }}</td>
-
-            <td>
-                <a href="/admin/view-item/{{ product.product_id }}">View</a>
-            </td>
-
-            <td>
-                <a href="/admin/delete-item/{{ product.product_id }}"
-                    onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
-            </td>
-        </tr>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            {{ message }}
+        </div>
         {% endfor %}
-    </table>
+        {% endwith %}
+
+
+        <!-- Search and Category Filter -->
+        <div class="filter-card">
+
+            <h3>Search & Filter Products</h3>
+
+            <form method="GET" action="/admin/item-list" class="filter-form">
+
+                <div class="search-box">
+                    <input type="search" name="search" placeholder="Search by product name..."
+                        value="{{ request.args.get('search', '') }}">
+                </div>
+
+                <select name="category">
+
+                    <option value="">All Categories</option>
+
+                    {% for cat in categories %}
+                    <option value="{{ cat.category }}" {% if request.args.get('category')==cat.category %}selected{%
+                        endif %}>
+                        {{ cat.category }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="filter-btn">
+                    Search / Filter
+                </button>
+
+                <a href="/admin/item-list" class="clear-btn">
+                    Clear Filters
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- Product Table -->
+        <div class="table-card">
+
+            <div class="table-heading">
+                <h3>All Products</h3>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>View</th>
+                                    <th>Update</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for product in products %}
+
+                        <tr>
+
+                            <td>{{ product.product_id }}</td>
+
+                            <td>
+                                <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}"
+                                    class="product-image">
+                            </td>
+
+                            <td class="product-name">
+                                {{ product.name }}
+                            </td>
+
+                            <td>
+                                <span class="category-badge">
+                                    {{ product.category }}
+                                </span>
+                            </td>
+
+                            <td class="price">
+                                ₹{{ "%.2f"|format(product.price|float) }}
+                            </td>
+
+                            <td>
+                                <a href="/admin/view-item/{{ product.product_id }}" class="action-btn view-btn">
+                                    View
+                                </a>
+                            </td>
+                            <td>
+                                <a href="/admin/update-item/{{ product.product_id }}" class="action-btn update-btn">
+                                    Update
+                                </a>
+                            </td>
+
+
+                            <td>
+                                <a href="/admin/delete-item/{{ product.product_id }}" class="action-btn delete-btn"
+                                    onclick="return confirm('Are you sure you want to delete this product?')">
+                                    Delete
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                No products found. Try another search or category.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
 
 </body>
 

@@ -1,26 +1,402 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Product Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 22px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4A3F35;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #B77B55;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1100px;
+            margin: 55px auto;
+            padding: 0 25px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #888888;
+        }
+
+        .breadcrumb a {
+            color: #B77B55;
+            text-decoration: none;
+        }
+
+        /* Product Details Card */
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 45px;
+            align-items: center;
+            background: #FFFFFF;
+            padding: 40px;
+            border: 1px solid #EDE6DC;
+            border-radius: 17px;
+            box-shadow: 0 10px 35px rgba(80, 60, 40, 0.06);
+        }
+
+        /* Product Image */
+        .image-section {
+            background: #FAF8F3;
+            border-radius: 13px;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .image-section img {
+            width: 100%;
+            max-width: 350px;
+            height: 350px;
+            object-fit: contain;
+            transition: 0.3s;
+        }
+
+        .image-section img:hover {
+            transform: scale(1.04);
+        }
+
+        /* Product Information */
+        .details-section {
+            padding: 15px 5px;
+        }
+
+        .details-section h1 {
+            font-size: 30px;
+            color: #4A3F35;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #F8F1EA;
+            color: #986342;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 22px;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #777777;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #F0EBE5;
+            font-size: 15px;
+        }
+
+        .info-item strong {
+            color: #4A3F35;
+            display: inline-block;
+            min-width: 95px;
+        }
+
+        .price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #B77B55;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 13px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .add-cart-btn {
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .add-cart-btn:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 23px;
+            border: 1px solid #D9B49A;
+            border-radius: 8px;
+            color: #986342;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #F8F1EA;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 13px 16px;
+            background: #EEF5EC;
+            color: #39734B;
+            border: 1px solid #D8E8D5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            background: #FCEBE9;
+            color: #A33A32;
+            border-color: #F3D0CC;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999999;
+            font-size: 13px;
+            margin-top: 50px;
+        }
+
+        /* Responsive */
+        @media (max-width: 750px) {
+
+            .product-details {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                padding: 25px;
+            }
+
+            .image-section {
+                min-height: 300px;
+            }
+
+            .image-section img {
+                height: 260px;
+            }
+
+            .details-section h1 {
+                font-size: 25px;
+            }
+
+            .main-container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 450px) {
+
+            .navbar {
+                padding: 16px 18px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .product-details {
+                padding: 18px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .add-cart-btn,
+            .back-btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>{{ product.name }}</h2>
+    <!-- Navbar -->
+    <nav class="navbar">
 
-    <img src="/static/uploads/product_images/{{ product.image }}" width="300"><br><br>
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    <p><strong>Description:</strong> {{ product.description }}</p>
-    <p><strong>Category:</strong> {{ product.category }}</p>
-    <p><strong>Price:</strong> ₹{{ product.price }}</p>
+        <div class="nav-links">
+            <a href="/user-dashboard">Home</a>
+            <a href="/user/products">Products</a>
+            <a href="/user/cart">Cart 🛒</a>
+        </div>
 
-    <br>
-    <a href="/user/products">Back to Products</a>
-    <form action="/user/add-to-cart/{{ product.product_id }}" method="GET">
-    <button type="submit">Add to Cart</button>
-</form>
+    </nav>
 
+
+    <main class="main-container">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/user-dashboard">Home</a>
+            /
+            <a href="/user/products">Products</a>
+            / Product Details
+        </div>
+
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+
+        <!-- Product Details -->
+        <div class="product-details">
+
+            <!-- Product Image -->
+            <div class="image-section">
+
+                <img
+                    src="/static/uploads/product_images/{{ product.image }}"
+                    alt="{{ product.name }}">
+
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="details-section">
+
+                <span class="category-badge">
+                    {{ product.category }}
+                </span>
+
+                <h1>{{ product.name }}</h1>
+
+                <p class="description">
+                    {{ product.description }}
+                </p>
+
+                <div class="info-item">
+                    <strong>Category:</strong>
+                    {{ product.category }}
+                </div>
+
+                <div class="info-item">
+                    <strong>Price:</strong>
+                    <span class="price">
+                        ₹{{ product.price }}
+                    </span>
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="button-group">
+
+                    <form
+                        action="/user/add-to-cart/{{ product.product_id }}"
+                        method="GET">
+
+                        <button type="submit" class="add-cart-btn">
+                            🛒 Add to Cart
+                        </button>
+
+                    </form>
+
+                    <a href="/user/products" class="back-btn">
+                        ← Back to Products
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
 
 </body>
 

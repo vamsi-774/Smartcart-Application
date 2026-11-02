@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payment | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #986342;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .navbar a:hover {
+            color: #B77B55;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 45px 20px;
+        }
+
+        /* Payment Card */
+        .payment-card {
+            width: 100%;
+            max-width: 520px;
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 18px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(80, 60, 40, 0.08);
+        }
+
+        .payment-icon {
+            width: 80px;
+            height: 80px;
+            background: #F8F1EA;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 22px;
+            font-size: 35px;
+        }
+
+        .payment-card h2 {
+            font-size: 28px;
+            color: #4A3F35;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #888888;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        /* Amount Section */
+        .amount-box {
+            background: #FAF8F3;
+            border: 1px solid #EDE6DC;
+            border-radius: 12px;
+            padding: 27px 15px;
+            margin-bottom: 25px;
+        }
+
+        .amount-label {
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .amount {
+            color: #B77B55;
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        /* Security */
+        .payment-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 25px;
+            color: #64805C;
+            font-size: 13px;
+        }
+
+        /* Payment Button */
+        #rzp-button {
+            width: 100%;
+            padding: 16px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #rzp-button:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(183, 123, 85, 0.2);
+        }
+
+        #rzp-button:active {
+            transform: scale(0.98);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 23px;
+            text-decoration: none;
+            color: #986342;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #B77B55;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 22px;
+            color: #999999;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media(max-width: 550px) {
+
+            .payment-card {
+                padding: 30px 22px;
+            }
+
+            .payment-card h2 {
+                font-size: 24px;
+            }
+
+            .amount {
+                font-size: 30px;
+            }
+
+            .navbar {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
+
+        <a href="/user-dashboard">Home</a>
+
+    </nav>
+
+
+    <!-- Main Payment Section -->
+    <main class="main-container">
+
+        <div class="payment-card">
+
+            <div class="payment-icon">
+                💳
+            </div>
+
+            <h2>Complete Your Payment</h2>
+
+            <p class="subtitle">
+                You're just one step away from completing your order.
+                Review your payment amount and proceed securely.
+            </p>
+
+
+            <!-- Amount -->
+            <div class="amount-box">
+
+                <p class="amount-label">
+                    Total Amount to Pay
+                </p>
+
+                <p class="amount">
+                    ₹{{ "%.2f"|format(amount|float) }}
+                </p>
+
+            </div>
+
+
+            <!-- Security Information -->
+            <div class="payment-info">
+
+                <span>🔒</span>
+
+                <span>Secure payment powered by Razorpay</span>
+
+            </div>
+
+
+            <!-- Razorpay Button -->
+            <button type="button" id="rzp-button">
+                Pay Now →
+            </button>
+
+
+            <a href="/user/order-review" class="back-link">
+                ← Back to Order Review
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
+
+
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+    var options = {
+        "key": "{{ key_id }}",
+        "amount": "{{ amount * 100 }}",  // in paise
+        "currency": "INR",
+        "name": "SmartCart",
+        "description": "Order Payment",
+        "order_id": "{{ order_id }}",
+        "handler": function (response){
+            // PAYMENT SUCCESS
+            window.location.href = "/payment-success?payment_id=" 
+                                    + response.razorpay_payment_id 
+                                    + "&order_id=" + response.razorpay_order_id;
+        },
+    };
+
+    var rzp = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    }
+    </script>
+
+</body>
+
+</html>

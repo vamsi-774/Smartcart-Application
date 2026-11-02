@@ -1,62 +1,731 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Your Cart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Shopping Cart | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4A3F35;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #B77B55;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1150px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #888888;
+            font-size: 14px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 13px 16px;
+            background: #FCEBE9;
+            color: #A33A32;
+            border: 1px solid #F3D0CC;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Cart Card */
+        .cart-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(80, 60, 40, 0.05);
+            overflow-x: auto;
+        }
+
+        .cart-card h2 {
+            font-size: 21px;
+            margin-bottom: 22px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        thead {
+            background: #F8F1EA;
+        }
+
+        th {
+            padding: 16px 13px;
+            text-align: left;
+            color: #6B5140;
+            font-size: 14px;
+            border-bottom: 1px solid #EDE6DC;
+        }
+
+        td {
+            padding: 18px 13px;
+            border-bottom: 1px solid #F0EBE5;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #FFFEFC;
+        }
+
+        /* Checkbox */
+        .select-column {
+            text-align: center;
+        }
+
+        .product-checkbox,
+        #select-all {
+            width: 19px;
+            height: 19px;
+            accent-color: #B77B55;
+            cursor: pointer;
+        }
+
+        /* Product Image */
+        .product-image {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            background: #FAF8F3;
+            border-radius: 9px;
+            padding: 7px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #4A3F35;
+        }
+
+        .product-price {
+            font-weight: 600;
+            color: #986342;
+            white-space: nowrap;
+        }
+
+        /* Quantity */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quantity-control a {
+            width: 29px;
+            height: 29px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #F8F1EA;
+            color: #986342;
+            text-decoration: none;
+            border: 1px solid #E8D8C9;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .quantity-control a:hover {
+            background: #B77B55;
+            color: #FFFFFF;
+        }
+
+        .quantity-value {
+            font-weight: 700;
+            min-width: 15px;
+            text-align: center;
+        }
+
+        /* Remove */
+        .remove-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: #B94B43;
+            background: #FCEBE9;
+            padding: 8px 13px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .remove-btn:hover {
+            background: #B94B43;
+            color: #FFFFFF;
+        }
+
+        /* Summary */
+        .cart-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .summary-box {
+            width: 350px;
+            background: #FAF8F3;
+            border: 1px solid #EDE6DC;
+            padding: 22px;
+            border-radius: 11px;
+        }
+
+        .summary-box h3 {
+            font-size: 18px;
+            margin-bottom: 18px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #777777;
+            margin-bottom: 14px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #E2D9CF;
+        }
+
+        .total-label {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .total-price {
+            font-size: 23px;
+            font-weight: 800;
+            color: #B77B55;
+        }
+
+        .selected-count {
+            font-size: 13px;
+            color: #888888;
+            margin-top: 12px;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .continue-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: #986342;
+            border: 1px solid #D9B49A;
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .continue-btn:hover {
+            background: #F8F1EA;
+        }
+
+        .proceed-btn {
+            display: inline-block;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 13px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .proceed-btn:hover {
+            background: #986342;
+        }
+
+        .proceed-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Empty Cart */
+        .empty-cart {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 14px;
+            padding: 65px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 65px;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .empty-cart p {
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 13px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999999;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media(max-width: 650px) {
+
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .main-container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+
+            .cart-card {
+                padding: 15px;
+            }
+
+            .summary-box {
+                width: 100%;
+            }
+
+            .cart-summary {
+                justify-content: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons a,
+            .action-buttons button {
+                text-align: center;
+                width: 100%;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <h2>Your Cart</h2>
+    <!-- Navbar -->
+    <nav class="navbar">
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:red;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    {% if not cart %}
-    <p>Your cart is empty.</p>
-    <a href="/user/products">Shop Now</a>
-    {% else %}
+        <div class="nav-links">
+            <a href="/user-dashboard">Home</a>
+            <a href="/user/products">Products</a>
+        </div>
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th>Action</th>
-        </tr>
+    </nav>
 
-        {% for pid, item in cart.items() %}
-        <tr>
-            <td><img src="/static/uploads/product_images/{{ item.image }}" width="80"></td>
-            <td>{{ item.name }}</td>
-            <td>₹{{ item.price }}</td>
 
-            <td>
-                <a href="/user/cart/decrease/{{ pid }}"> - </a>
-                {{ item.quantity }}
-                <a href="/user/cart/increase/{{ pid }}"> + </a>
-            </td>
+    <main class="main-container">
 
-            <td>₹{{ item.price * item.quantity }}</td>
+        <div class="page-heading">
 
-            <td><a href="/user/cart/remove/{{ pid }}">Remove</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+            <h1>Your Shopping Cart 🛒</h1>
 
-    <br>
+            <p>
+                Review your products before proceeding to checkout.
+            </p>
 
-    <h3>Grand Total: ₹{{ grand_total }}</h3>
+        </div>
 
-    <a href="/user/products">Continue Shopping</a>
 
-    {% endif %}
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+
+        {% if not cart %}
+
+            <div class="empty-cart">
+
+                <div class="empty-icon">🛒</div>
+
+                <h2>Your Cart is Empty!</h2>
+
+                <p>
+                    Looks like you haven't added anything
+                    to your cart yet.
+                </p>
+
+                <a href="/user/products" class="shop-btn">
+                    Shop Now →
+                </a>
+
+            </div>
+
+        {% else %}
+
+
+            <div class="cart-card">
+
+                <h2>Cart Items ({{ cart|length }})</h2>
+
+
+                <!-- Selection Form -->
+                <form method="POST" action="/user/address" id="cart-form">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="select-column">
+                                    <input type="checkbox"
+                                           id="select-all"
+                                           checked>
+                                </th>
+
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for pid, item in cart.items() %}
+
+                            <tr class="cart-row"
+                                data-price="{{ item.price }}"
+                                data-quantity="{{ item.quantity }}">
+
+                                <td class="select-column">
+
+                                    <input
+                                        type="checkbox"
+                                        name="selected_products"
+                                        value="{{ pid }}"
+                                        class="product-checkbox"
+                                        checked>
+
+                                </td>
+
+                                <td>
+
+                                    <img
+                                        src="/static/uploads/product_images/{{ item.image }}"
+                                        alt="{{ item.name }}"
+                                        class="product-image">
+
+                                </td>
+
+                                <td class="product-name">
+                                    {{ item.name }}
+                                </td>
+
+                                <td class="product-price">
+                                    ₹{{ "%.2f"|format(item.price|float) }}
+                                </td>
+
+                                <td>
+
+                                    <div class="quantity-control">
+
+                                        <a href="/user/cart/decrease/{{ pid }}">−</a>
+
+                                        <span class="quantity-value">
+                                            {{ item.quantity }}
+                                        </span>
+
+                                        <a href="/user/cart/increase/{{ pid }}">+</a>
+
+                                    </div>
+
+                                </td>
+
+                                <td class="product-price">
+
+                                    ₹{{ "%.2f"|format((item.price|float) * (item.quantity|int)) }}
+
+                                </td>
+
+                                <td>
+
+                                    <a
+                                        href="/user/cart/remove/{{ pid }}"
+                                        class="remove-btn"
+                                        onclick="return confirm('Are you sure you want to remove this product?')">
+
+                                        Remove
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+
+                    <!-- Order Summary -->
+                    <div class="cart-summary">
+
+                        <div class="summary-box">
+
+                            <h3>Order Summary</h3>
+
+                            <div class="summary-item">
+                                <span>Total Products</span>
+                                <span>{{ cart|length }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span>Selected Products</span>
+                                <span id="selected-count-number">
+                                    {{ cart|length }}
+                                </span>
+                            </div>
+
+                            <div class="total-row">
+
+                                <span class="total-label">
+                                    Selected Total
+                                </span>
+
+                                <span class="total-price"
+                                      id="selected-total">
+                                    ₹0.00
+                                </span>
+
+                            </div>
+
+                            <p class="selected-count"
+                               id="selected-count">
+                                All products selected
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Buttons -->
+                    <div class="action-buttons">
+
+                        <a href="/user/products" class="continue-btn">
+                            ← Continue Shopping
+                        </a>
+
+                        <button type="submit"
+                                class="proceed-btn"
+                                id="proceed-btn">
+
+                            Proceed to Checkout →
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script>
+
+        function calculateSelectedTotal() {
+
+            let total = 0;
+            let count = 0;
+
+            const rows = document.querySelectorAll('.cart-row');
+
+            rows.forEach(row => {
+
+                const checkbox = row.querySelector('.product-checkbox');
+
+                if (checkbox.checked) {
+
+                    const price = parseFloat(row.dataset.price);
+                    const quantity = parseInt(row.dataset.quantity);
+
+                    total += price * quantity;
+                    count++;
+
+                }
+
+            });
+
+            document.getElementById('selected-total').innerText =
+                '₹' + total.toFixed(2);
+
+            document.getElementById('selected-count-number').innerText =
+                count;
+
+            document.getElementById('selected-count').innerText =
+                count === 0
+                    ? 'No products selected'
+                    : count + (count === 1
+                        ? ' product selected'
+                        : ' products selected');
+
+            const selectAll = document.getElementById('select-all');
+
+            selectAll.checked =
+                rows.length > 0 && count === rows.length;
+
+            selectAll.indeterminate =
+                count > 0 && count < rows.length;
+
+            document.getElementById('proceed-btn').disabled =
+                count === 0;
+
+        }
+
+
+        // Individual checkbox
+        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+
+            checkbox.addEventListener('change', calculateSelectedTotal);
+
+        });
+
+
+        // Select All
+        document.getElementById('select-all')?.addEventListener('change', function () {
+
+            document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+
+                checkbox.checked = this.checked;
+
+            });
+
+            calculateSelectedTotal();
+
+        });
+
+
+        // Initial calculation
+        calculateSelectedTotal();
+
+    </script>
 
 </body>
 

@@ -1,36 +1,225 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Signup</title>
+    <title>Admin Registration | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 430px;
+            background: #FFFFFF;
+            padding: 40px 35px;
+            border-radius: 15px;
+            border: 1px solid #EDE6DC;
+            box-shadow: 0 8px 30px rgba(80, 60, 40, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 30px;
+            font-weight: 800;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: #B77B55;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #4A3F35;
+            font-size: 23px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #4A3F35;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            color: #333333;
+            background: #FFFEFC;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        input::placeholder {
+            color: #AAAAAA;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        .flash-message {
+            padding: 11px 13px;
+            border-radius: 7px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .flash-message.error {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #888888;
+        }
+
+        .footer a {
+            color: #B77B55;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                padding: 30px 22px;
+            }
+
+            .logo {
+                font-size: 27px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h2>Admin Registration</h2>
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:red;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
 
-    <form method="POST" action="/admin-signup">
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
+    <div class="signup-container">
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+        <h1 class="logo">Smart <span>Cart</span></h1>
 
-        <button type="submit">Send OTP</button>
-    </form>
+        <p class="subtitle">Your Shopping Experience, Made Smarter.</p>
+
+        <h2>Admin Registration</h2>
+
+        <p class="description">
+            Enter your details to register as an administrator.
+        </p>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="/admin-signup">
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    required>
+            </div>
+
+            <button type="submit">Send OTP</button>
+
+        </form>
+
+        <div class="footer">
+            © 2026 Smart Cart. All Rights Reserved.
+        </div>
+
+    </div>
 
 </body>
-
-</html>
-
-
-</body>
-
 </html>

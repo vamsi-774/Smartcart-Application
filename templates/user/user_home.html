@@ -1,28 +1,299 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>User Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            background: #B77B55;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .dashboard {
+            max-width: 1100px;
+            margin: 55px auto;
+            padding: 0 25px;
+        }
+
+        .welcome-card {
+            background: #FFFFFF;
+            padding: 40px;
+            border: 1px solid #EDE6DC;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(80, 60, 40, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .welcome-card h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-card h1 span {
+            color: #B77B55;
+        }
+
+        .welcome-card p {
+            color: #888888;
+            font-size: 15px;
+        }
+
+        .flash-message {
+            padding: 12px 15px;
+            background: #EEF5EC;
+            color: #39734B;
+            border: 1px solid #D8E8D5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .dashboard-card {
+            background: #FFFFFF;
+            padding: 30px;
+            border: 1px solid #EDE6DC;
+            border-radius: 13px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.04);
+            transition: 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: #D9B49A;
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            color: #888888;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .card-btn:hover {
+            background: #986342;
+        }
+
+        /* Cart Count Badge */
+        .cart-count {
+            min-width: 23px;
+            height: 23px;
+            padding: 2px 7px;
+            background: #FFFFFF;
+            color: #B77B55;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999999;
+            font-size: 13px;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 600px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .dashboard {
+                margin: 30px auto;
+            }
+
+            .welcome-card {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:green;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
+    <!-- Navbar -->
+    <nav class="navbar">
 
-    <h2>Welcome, {{ user_name }}!</h2>
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    <a href="/user/products">Browse Products</a><br><br>
-    <br><br>
-    <a href="/user/cart">Cart</a>
+        <a href="/user-logout" class="logout-btn">
+            Logout
+        </a>
 
-    <br><br>
-    <a href="/user-logout">Logout</a>
+    </nav>
+
+
+    <main class="dashboard">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+
+        <!-- Welcome Section -->
+        <section class="welcome-card">
+
+            <h1>
+                Welcome, <span>{{ user_name }}!</span>
+            </h1>
+
+            <p>
+                Discover products and enjoy your shopping
+                experience with Smart Cart.
+            </p>
+
+        </section>
+
+
+        <h2 class="section-heading">My Shopping</h2>
+
+
+        <!-- Dashboard Cards -->
+        <div class="card-container">
+
+            <!-- Browse Products -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">🛍️</div>
+
+                <h3>Browse Products</h3>
+
+                <p>
+                    Explore our collection and discover
+                    products that suit your needs.
+                </p>
+
+                <a href="/user/products" class="card-btn">
+                    Browse Products →
+                </a>
+
+            </div>
+
+
+            <!-- Shopping Cart -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">🛒</div>
+
+                <h3>My Shopping Cart</h3>
+
+                <p>
+                    View your selected products and
+                    proceed with your shopping.
+                </p>
+
+                <a href="/user/cart" class="card-btn">
+
+                    Cart
+
+                    <span class="cart-count">
+                        {{ cart_count }}
+                    </span>
+
+                    →
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
 
 </body>
-
 </html>

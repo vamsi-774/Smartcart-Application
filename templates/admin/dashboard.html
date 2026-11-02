@@ -1,29 +1,343 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 10px 22px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #986342;
+        }
+
+        /* Main Content */
+        .dashboard {
+            max-width: 1150px;
+            margin: 55px auto;
+            padding: 0 25px;
+        }
+
+        .welcome-section {
+            background: #FFFFFF;
+            padding: 35px;
+            border: 1px solid #EDE6DC;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(80, 60, 40, 0.05);
+            margin-bottom: 35px;
+        }
+
+        .welcome-section h1 {
+            font-size: 30px;
+            color: #4A3F35;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section h1 span {
+            color: #B77B55;
+        }
+
+        .welcome-section p {
+            color: #888888;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 13px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .flash-message.error {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        /* Dashboard Cards */
+        .section-heading {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #4A3F35;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .dashboard-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 13px;
+            padding: 30px 25px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.04);
+            transition: 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(80, 60, 40, 0.09);
+            border-color: #D9B49A;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: #F8F1EA;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 23px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card h3 {
+            font-size: 19px;
+            color: #4A3F35;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            font-size: 14px;
+            color: #888888;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .card-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #B77B55;
+            color: #FFFFFF;
+            padding: 11px 19px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .card-btn:hover {
+            background: #986342;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 15px;
+            color: #999999;
+            font-size: 13px;
+            margin-top: 50px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .welcome-section h1 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                padding: 16px 20px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .dashboard {
+                margin: 30px auto;
+                padding: 0 18px;
+            }
+
+            .welcome-section {
+                padding: 25px 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <p style="color:green;">{{ message }}</p>
-    {% endfor %}
-    {% endwith %}
 
-    <h2>Welcome, {{ admin_name }}</h2>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
 
-    <!-- Logout Button -->
-    <a href="/admin-logout">Logout</a>
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
 
-    <p>This is your admin dashboard.</p>
-    <a href="/admin/add-item">Add Product</a>
-    <a href="/admin/item-list">View All Products</a>
-    <a href="/admin/profile">Profile</a>
+        <a href="/admin-logout" class="logout-btn">
+            Logout
+        </a>
 
+    </nav>
+
+
+    <!-- Dashboard Content -->
+    <main class="dashboard">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+
+            <h1>
+                Welcome, <span>{{ admin_name }}</span>
+            </h1>
+
+            <p>
+                Welcome to your Smart Cart Admin Dashboard.
+                Manage products, view your inventory and update your profile
+                from one place.
+            </p>
+
+        </section>
+
+
+        <!-- Dashboard Options -->
+        <h2 class="section-heading">Dashboard Overview</h2>
+
+        <div class="card-container">
+
+            <!-- Add Product -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">📦</div>
+
+                <h3>Add Product</h3>
+
+                <p>
+                    Add new products to your Smart Cart store
+                    and manage your product inventory.
+                </p>
+
+                <a href="/admin/add-item" class="card-btn">
+                    Add Product →
+                </a>
+
+            </div>
+
+
+            <!-- View Products -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">🛍️</div>
+
+                <h3>View All Products</h3>
+
+                <p>
+                    View your existing products and manage
+                    the available items in your store.
+                </p>
+
+                <a href="/admin/item-list" class="card-btn">
+                    View Products →
+                </a>
+
+            </div>
+
+
+            <!-- Admin Profile -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">👤</div>
+
+                <h3>My Profile</h3>
+
+                <p>
+                    View and manage your administrator
+                    account information.
+                </p>
+
+                <a href="/admin/profile" class="card-btn">
+                    View Profile →
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 Smart Cart. All Rights Reserved.
+    </footer>
 
 </body>
-
 </html>

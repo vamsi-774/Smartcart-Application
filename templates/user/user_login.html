@@ -1,37 +1,266 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>User Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login | Smart Cart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px 20px;
+            color: #4A3F35;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            background: #FFFFFF;
+            padding: 40px;
+            border-radius: 18px;
+            border: 1px solid #EDE6DC;
+            box-shadow: 0 12px 40px rgba(80, 60, 40, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 34px;
+            font-weight: 800;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 25px;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 28px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .flash-message.success {
+            color: #39734B;
+            background: #EEF5EC;
+            border: 1px solid #D8E8D5;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            color: #A33A32;
+            background: #FCEBE9;
+            border: 1px solid #F3D0CC;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A3F35;
+            margin-bottom: 9px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #E2D9CF;
+            border-radius: 8px;
+            background: #FFFEFC;
+            font-size: 14px;
+            color: #333333;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        input::placeholder {
+            color: #AAAAAA;
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        /* Registration Link */
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #888888;
+        }
+
+        .register-link a {
+            color: #B77B55;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            color: #986342;
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 13px;
+            color: #999999;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .login-container {
+                padding: 30px 22px;
+            }
+
+            .logo {
+                font-size: 30px;
+            }
+
+            h2 {
+                font-size: 23px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>User Login</h2>
+    <div class="login-container">
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <p style="color:red;">{{ message }}</p>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+        <!-- Logo -->
+        <h1 class="logo">Smart <span>Cart</span></h1>
 
-    <form method="POST" action="/user-login">
+        <p class="subtitle">
+            Your Shopping Experience, Made Smarter.
+        </p>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+        <!-- Heading -->
+        <h2>Welcome Back!</h2>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <p class="description">
+            Login to your Smart Cart account and continue shopping.
+        </p>
 
-        <button type="submit">Login</button>
-    </form>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <br>
-    <a href="/user-register">Create Account</a>
+        <!-- Login Form -->
+        <form method="POST" action="/user-login">
+
+            <div class="form-group">
+
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required>
+
+            </div>
+
+            <button type="submit" class="login-btn">
+                Login
+            </button>
+
+        </form>
+
+        <!-- Registration Link -->
+        <div class="register-link">
+            Don't have an account?
+            <a href="/user-register">Create Account</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            © 2026 Smart Cart. All Rights Reserved.
+        </div>
+
+    </div>
 
 </body>
-
 </html>

@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Review Order | Smart Cart</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #FAF8F3;
+            color: #4A3F35;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #986342;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Main */
+        .main-container {
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            font-size: 29px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #888888;
+            font-size: 14px;
+        }
+
+        /* Cards */
+        .review-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 13px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 7px 22px rgba(80, 60, 40, 0.05);
+        }
+
+        .card-heading {
+            font-size: 19px;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #EFE8DF;
+        }
+
+        /* Address */
+        .address-details {
+            line-height: 1.9;
+            font-size: 14px;
+            color: #70665E;
+        }
+
+        .address-details strong {
+            color: #4A3F35;
+        }
+
+        .address-label {
+            display: inline-block;
+            background: #F8F1EA;
+            color: #986342;
+            padding: 6px 13px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        /* Products */
+        .product-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid #F0EBE5;
+        }
+
+        .product-row:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: #FAF8F3;
+            border-radius: 9px;
+            padding: 8px;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info h3 {
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        .product-info p {
+            font-size: 13px;
+            color: #888888;
+            margin-bottom: 5px;
+        }
+
+        .product-total {
+            font-size: 16px;
+            font-weight: 700;
+            color: #986342;
+            white-space: nowrap;
+        }
+
+        /* Price Summary */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #777777;
+        }
+
+        .grand-total {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #E5DACE;
+            padding-top: 18px;
+            margin-top: 15px;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .grand-total span:last-child {
+            color: #B77B55;
+            font-size: 22px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            padding: 13px 23px;
+            border: 1px solid #D9B49A;
+            border-radius: 8px;
+            color: #986342;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #F8F1EA;
+        }
+
+        .pay-btn {
+            padding: 13px 28px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .pay-btn:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #999999;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+
+            .main-container {
+                margin: 25px auto;
+            }
+
+            .review-card {
+                padding: 18px;
+            }
+
+            .product-row {
+                gap: 12px;
+            }
+
+            .product-image {
+                width: 70px;
+                height: 70px;
+            }
+
+            .product-info h3 {
+                font-size: 14px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group a,
+            .button-group button {
+                text-align: center;
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
+
+        <a href="/user-dashboard">Home</a>
+
+    </nav>
+
+
+    <main class="main-container">
+
+        <!-- Heading -->
+        <div class="page-heading">
+
+            <h1>Review Your Order</h1>
+
+            <p>
+                Please verify your products and delivery
+                details before proceeding to payment.
+            </p>
+
+        </div>
+
+
+        <!-- Delivery Address -->
+        <div class="review-card">
+
+            <h2 class="card-heading">
+                Delivery Address
+            </h2>
+
+            <span class="address-label">
+                HOME ADDRESS
+            </span>
+
+            <div class="address-details">
+
+                <p>
+                    <strong>{{ delivery.full_name }}</strong>
+                </p>
+
+                <p>
+                    {{ delivery.address }}
+                </p>
+
+                <p>
+                    PIN Code: {{ delivery.pincode }}
+                </p>
+
+                <p>
+                    Mobile: {{ delivery.mobile }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Order Items -->
+        <div class="review-card">
+
+            <h2 class="card-heading">
+                Order Items ({{ order_items|length }})
+            </h2>
+
+            {% for item in order_items %}
+
+            <div class="product-row">
+
+                <img
+                    src="/static/uploads/product_images/{{ item.image }}"
+                    class="product-image"
+                    alt="{{ item.name }}">
+
+                <div class="product-info">
+
+                    <h3>{{ item.name }}</h3>
+
+                    <p>
+                        Price: ₹{{ "%.2f"|format(item.price) }}
+                    </p>
+
+                    <p>
+                        Quantity: {{ item.quantity }}
+                    </p>
+
+                </div>
+
+                <div class="product-total">
+
+                    ₹{{ "%.2f"|format(item.total) }}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Order Summary -->
+        <div class="review-card">
+
+            <h2 class="card-heading">
+                Price Details
+            </h2>
+
+            <div class="summary-row">
+
+                <span>Selected Products</span>
+
+                <span>{{ order_items|length }}</span>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>Subtotal</span>
+
+                <span>
+                    ₹{{ "%.2f"|format(grand_total) }}
+                </span>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>Delivery Charges</span>
+
+                <span style="color:green;">
+                    FREE
+                </span>
+
+            </div>
+
+            <div class="grand-total">
+
+                <span>Grand Total</span>
+
+                <span>
+                    ₹{{ "%.2f"|format(grand_total) }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+
+            <a href="/user/address" class="back-btn">
+                ← Change Address
+            </a>
+
+            <form method="POST" action="/user/pay">
+
+                <button type="submit" class="pay-btn">
+                    Proceed to Pay →
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        © 2026 Smart Cart. All Rights Reserved.
+
+    </footer>
+
+</body>
+
+</html>

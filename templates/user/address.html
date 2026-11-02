@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Delivery Address | Smart Cart</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: #4A3F35;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #986342;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 750px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        /* Address Card */
+        .address-card {
+            background: #FFFFFF;
+            padding: 40px;
+            border: 1px solid #EDE6DC;
+            border-radius: 15px;
+            box-shadow: 0 10px 35px rgba(80, 60, 40, 0.07);
+        }
+
+        .heading {
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            font-size: 29px;
+            color: #4A3F35;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            color: #888888;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .heading-line {
+            width: 55px;
+            height: 4px;
+            background: #C58B65;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 13px 16px;
+            background: #FCEBE9;
+            color: #A33A32;
+            border: 1px solid #F3D0CC;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 23px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 9px;
+            color: #4A3F35;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #E2D8CD;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #4A3F35;
+            background: #FFFEFC;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input {
+            height: 48px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #B77B55;
+            box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #AAAAAA;
+        }
+
+        /* Button */
+        .proceed-btn {
+            width: 100%;
+            padding: 15px;
+            background: #B77B55;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+        }
+
+        .proceed-btn:hover {
+            background: #986342;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 123, 85, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #999999;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+
+            .main-container {
+                margin: 25px auto;
+            }
+
+            .address-card {
+                padding: 25px 20px;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            Smart <span>Cart</span>
+        </div>
+
+        <a href="/user/cart">
+            ← Back to Cart
+        </a>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <div class="address-card">
+
+            <div class="heading">
+
+                <h1>Delivery Address</h1>
+
+                <p>
+                    Please provide your delivery details
+                    to continue with your order.
+                </p>
+
+                <div class="heading-line"></div>
+
+            </div>
+
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- Address Form -->
+            <form method="POST" action="/user/order-review">
+
+                <div class="form-group">
+
+                    <label for="full_name">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Enter your full name"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="mobile">
+                        Mobile Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="mobile"
+                        name="mobile"
+                        placeholder="Enter your 10-digit mobile number"
+                        pattern="[6-9][0-9]{9}"
+                        maxlength="10"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="address">
+                        Delivery Address
+                    </label>
+
+                    <textarea
+                        id="address"
+                        name="address"
+                        placeholder="House No, Street, Area, City, State"
+                        required></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="pincode">
+                        PIN Code
+                    </label>
+
+                    <input
+                        type="text"
+                        id="pincode"
+                        name="pincode"
+                        placeholder="Enter your 6-digit PIN code"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        required>
+
+                </div>
+
+
+                <button type="submit" class="proceed-btn">
+
+                    Review Your Order →
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        © 2026 Smart Cart. All Rights Reserved.
+
+    </footer>
+
+
+</body>
+
+</html>
