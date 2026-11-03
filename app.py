@@ -6,7 +6,10 @@ import random
 import config
 import os
 from werkzeug.utils import secure_filename
+from flask import request, jsonify, render_template
 import razorpay
+import traceback
+
 
 
 
@@ -843,37 +846,45 @@ def user_logout():
 # =================================================================
 # ROUTE: USER PRODUCT LISTING (SEARCH + FILTER)
 # =================================================================
+
 @app.route('/user/products')
 def user_products():
-
-    # Optional: restrict only logged-in users
-    if 'user_id' not in session:
-        flash("Please login to view products!", "danger")
-        return redirect('/user-login')
-
-    search = request.args.get('search', '')
-    category_filter = request.args.get('category', '')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Fetch categories for filter dropdown
-    cursor.execute("SELECT DISTINCT category FROM products")
+    # Get search and category values from URL
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+
+    # Fetch all available categories
+    cursor.execute("""
+        SELECT DISTINCT category
+        FROM products
+        WHERE category IS NOT NULL AND category != ''
+        ORDER BY category
+    """)
+
     categories = cursor.fetchall()
 
-    # Build dynamic SQL
+    # Base product query
     query = "SELECT * FROM products WHERE 1=1"
     params = []
 
+    # Search by product name
     if search:
         query += " AND name LIKE %s"
-        params.append("%" + search + "%")
+        params.append(f"%{search}%")
 
-    if category_filter:
+    # Filter by category
+    if category:
         query += " AND category = %s"
-        params.append(category_filter)
+        params.append(category)
 
-    cursor.execute(query, params)
+    # Execute final query
+    query += " ORDER BY product_id DESC"
+
+    cursor.execute(query, tuple(params))
     products = cursor.fetchall()
 
     cursor.close()
@@ -884,6 +895,7 @@ def user_products():
         products=products,
         categories=categories
     )
+
 
 # ⭐ ROUTE 6: Single Product Details Page
 # =================================================================
@@ -1184,7 +1196,133 @@ def user_pay():
         key_id=config.RAZORPAY_KEY_ID,
         order_id=razorpay_order['id']
     )
+# ------------------------------
+# Route: Verify Payment and Store Order
+# ------------------------------
+@app.route('/verify-payment', methods=['POST'])
+def verify_payment():
+    if 'user_id' not in session:
+        flash("Please login to complete the payment.", "danger")
+        return redirect('/user-login')
 
+    # Read values posted from frontend
+    razorpay_payment_id = request.form.get('razorpay_payment_id')
+    razorpay_order_id = request.form.get('razorpay_order_id')
+    razorpay_signature = request.form.get('razorpay_signature')
+
+    if not (razorpay_payment_id and razorpay_order_id and razorpay_signature):
+        flash("Payment verification failed (missing data).", "danger")
+        return redirect('/user/cart')
+
+    # Build verification payload required by Razorpay client.utility
+    payload = {
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_payment_id': razorpay_payment_id,
+        'razorpay_signature': razorpay_signature
+    }
+
+    try:
+        # This will raise an error if signature invalid
+        razorpay_client.utility.verify_payment_signature(payload)
+
+    except Exception as e:
+        # Verification failed
+        app.logger.error("Razorpay signature verification failed: %s", str(e))
+        flash("Payment verification failed. Please contact support.", "danger")
+        return redirect('/user/cart')
+
+    # Signature verified — now store order and items into DB
+    user_id = session['user_id']
+    cart = session.get('cart', {})
+
+    if not cart:
+        flash("Cart is empty. Cannot create order.", "danger")
+        return redirect('/user/products')
+
+    # Calculate total amount (ensure same as earlier)
+    total_amount = sum(item['price'] * item['quantity'] for item in cart.values())
+
+    # DB insert: orders and order_items
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Insert into orders table
+        cursor.execute("""
+            INSERT INTO orders (user_id, razorpay_order_id, razorpay_payment_id, amount, payment_status)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, razorpay_order_id, razorpay_payment_id, total_amount, 'paid'))
+
+        order_db_id = cursor.lastrowid  # newly created order's primary key
+
+        # Insert all items
+        for pid_str, item in cart.items():
+            product_id = int(pid_str)
+            cursor.execute("""
+                INSERT INTO order_items (order_id, product_id, product_name, quantity, price)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (order_db_id, product_id, item['name'], item['quantity'], item['price']))
+
+        # Commit transaction
+        conn.commit()
+
+        # Clear cart and temporary razorpay order id
+        session.pop('cart', None)
+        session.pop('razorpay_order_id', None)
+
+        flash("Payment successful and order placed!", "success")
+        return redirect(f"/user/order-success/{order_db_id}")
+
+    except Exception as e:
+        # Rollback and log error
+        conn.rollback()
+        app.logger.error("Order storage failed: %s\n%s", str(e), traceback.format_exc())
+        flash("There was an error saving your order. Contact support.", "danger")
+        return redirect('/user/cart')
+
+    finally:
+        cursor.close()
+        conn.close()
+@app.route('/user/order-success/<int:order_db_id>')
+def order_success(order_db_id):
+    if 'user_id' not in session:
+        flash("Please login!", "danger")
+        return redirect('/user-login')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM orders WHERE order_id=%s AND user_id=%s", (order_db_id, session['user_id']))
+    order = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM order_items WHERE order_id=%s", (order_db_id,))
+    items = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if not order:
+        flash("Order not found.", "danger")
+        return redirect('/user/products')
+
+    return render_template("user/order_success.html", order=order, items=items)
+
+@app.route('/user/my-orders')
+def my_orders():
+    if 'user_id' not in session:
+        flash("Please login!", "danger")
+        return redirect('/user-login')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM orders WHERE user_id=%s ORDER BY created_at DESC", (session['user_id'],))
+    orders = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("user/my_orders.html", orders=orders)
 
 # ------------------------ RUN SERVER -----------------------
 if __name__ == "__main__":

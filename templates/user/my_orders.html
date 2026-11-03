@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | SmartCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FAF8F3;
+            color: #4A3F35;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 1100px;
+            margin: 50px auto;
+        }
+
+        .page-heading {
+            font-size: 30px;
+            margin-bottom: 30px;
+            color: #4A3F35;
+        }
+
+        .order-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E8DED4;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(74, 63, 53, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 18px rgba(74, 63, 53, 0.12);
+        }
+
+        .order-card h3 {
+            font-size: 21px;
+            color: #4A3F35;
+            margin-bottom: 18px;
+        }
+
+        .order-info {
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .order-info p {
+            margin-bottom: 8px;
+        }
+
+        .status {
+            display: inline-block;
+            background-color: #E8F3E8;
+            color: #367A42;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .view-btn,
+        .shop-btn {
+            padding: 11px 20px;
+            background-color: #B77B55;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 7px;
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        .view-btn:hover,
+        .shop-btn:hover {
+            background-color: #986342;
+        }
+
+        .empty-orders {
+            background-color: #FFFFFF;
+            padding: 45px 25px;
+            text-align: center;
+            border-radius: 14px;
+            border: 1px solid #E8DED4;
+            box-shadow: 0 4px 12px rgba(74, 63, 53, 0.06);
+        }
+
+        .empty-orders h3 {
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+
+        .empty-orders p {
+            color: #817366;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 92%;
+                margin: 30px auto;
+            }
+
+            .page-heading {
+                font-size: 25px;
+            }
+
+            .order-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2 class="page-heading">📦 My Orders</h2>
+
+    {% if orders|length == 0 %}
+
+        <div class="empty-orders">
+            <h3>No Orders Yet!</h3>
+            <p>You haven't placed any orders yet. Start shopping today.</p>
+            <a href="/user/products" class="shop-btn">Start Shopping →</a>
+        </div>
+
+    {% else %}
+
+        {% for order in orders %}
+        <div class="order-card">
+
+            <h3>Order #{{ order.order_id }}</h3>
+
+            <div class="order-info">
+                <p><strong>Amount:</strong> ₹{{ order.amount }}</p>
+
+                <p>
+                    <strong>Status:</strong>
+                    <span class="status">{{ order.payment_status }}</span>
+                </p>
+
+                <p><strong>Date:</strong> {{ order.created_at }}</p>
+            </div>
+
+            <a href="/user/order-success/{{ order.order_id }}" class="view-btn">
+                View Order Details →
+            </a>
+
+        </div>
+        {% endfor %}
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

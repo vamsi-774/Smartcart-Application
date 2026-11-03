@@ -122,24 +122,31 @@
         }
 
         .filter-card h3 {
-            font-size: 17px;
-            margin-bottom: 17px;
+            font-size: 19px;
+            margin-bottom: 18px;
         }
 
         .filter-form {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-wrap: wrap;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
         }
 
         .search-box {
             flex: 1;
-            min-width: 220px;
         }
 
         .search-box input,
-        select {
+        .filter-form select {
             width: 100%;
             padding: 13px 14px;
             border: 1px solid #E2D9CF;
@@ -152,16 +159,18 @@
         }
 
         .search-box input:focus,
-        select:focus {
+        .filter-form select:focus {
             border-color: #B77B55;
             box-shadow: 0 0 0 3px rgba(183, 123, 85, 0.12);
         }
 
-        select {
+        .filter-form select {
             width: 200px;
             cursor: pointer;
         }
 
+        /* Buttons */
+        .search-btn,
         .filter-btn {
             padding: 13px 23px;
             background: #B77B55;
@@ -172,8 +181,10 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
+            white-space: nowrap;
         }
 
+        .search-btn:hover,
         .filter-btn:hover {
             background: #986342;
         }
@@ -186,6 +197,7 @@
             border-radius: 8px;
             font-size: 14px;
             transition: 0.3s;
+            white-space: nowrap;
         }
 
         .clear-btn:hover {
@@ -340,10 +352,18 @@
             .filter-form {
                 flex-direction: column;
                 align-items: stretch;
+                width: 100%;
+            }
+
+            .search-form {
+                flex-direction: column;
+                width: 100%;
+                min-width: 0;
             }
 
             .search-box,
-            select,
+            .filter-form select,
+            .search-btn,
             .filter-btn,
             .clear-btn {
                 width: 100%;
@@ -414,39 +434,72 @@
 
             <h3>Find Your Products</h3>
 
-            <form method="GET" action="/user/products" class="filter-form">
+            <div class="filter-form">
 
-                <div class="search-box">
+                <!-- Search Form -->
+                <form method="GET"
+                      action="/user/products"
+                      class="search-form">
+
+                    <div class="search-box">
+                        <input
+                            type="search"
+                            name="search"
+                            placeholder="Search products..."
+                            value="{{ request.args.get('search', '') }}">
+                    </div>
+
+                    <!-- Preserve selected category -->
                     <input
-                        type="search"
+                        type="hidden"
+                        name="category"
+                        value="{{ request.args.get('category', '') }}">
+
+                    <button type="submit" class="search-btn">
+                        🔍 Search
+                    </button>
+
+                </form>
+
+
+                <!-- Category Filter Form -->
+                <form method="GET"
+                      action="/user/products"
+                      class="filter-form">
+
+                    <!-- Preserve search keyword -->
+                    <input
+                        type="hidden"
                         name="search"
-                        placeholder="Search products..."
                         value="{{ request.args.get('search', '') }}">
-                </div>
 
-                <select name="category">
+                    <select name="category">
 
-                    <option value="">All Categories</option>
+                        <option value="">All Categories</option>
 
-                    {% for cat in categories %}
-                        <option
-                            value="{{ cat.category }}"
-                            {% if request.args.get('category') == cat.category %}selected{% endif %}>
-                            {{ cat.category }}
-                        </option>
-                    {% endfor %}
+                        {% for cat in categories %}
+                            <option
+                                value="{{ cat.category }}"
+                                {% if request.args.get('category') == cat.category %}selected{% endif %}>
+                                {{ cat.category }}
+                            </option>
+                        {% endfor %}
 
-                </select>
+                    </select>
 
-                <button type="submit" class="filter-btn">
-                    Search / Filter
-                </button>
+                    <button type="submit" class="filter-btn">
+                        Filter
+                    </button>
 
+                </form>
+
+
+                <!-- Clear Filters -->
                 <a href="/user/products" class="clear-btn">
-                    Clear Filters
+                    Reset
                 </a>
 
-            </form>
+            </div>
 
         </div>
 

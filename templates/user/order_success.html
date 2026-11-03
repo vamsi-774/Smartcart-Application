@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful | SmartCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FAF8F3;
+            color: #4A3F35;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .success-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 25px auto;
+            padding: 35px;
+            text-align: center;
+            background-color: #FFFFFF;
+            border: 1px solid #E8DED4;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(74, 63, 53, 0.10);
+        }
+
+        .success-icon {
+            font-size: 55px;
+            margin-bottom: 12px;
+        }
+
+        .success-container h2 {
+            color: #367A42;
+            font-size: 29px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #817366;
+            margin-bottom: 25px;
+        }
+
+        .order-details {
+            text-align: left;
+            background-color: #F8F1EA;
+            border: 1px solid #EDE1D6;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-top: 25px;
+            line-height: 2;
+        }
+
+        .order-details p {
+            font-size: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .order-details strong {
+            color: #4A3F35;
+        }
+
+        .items-list {
+            margin-top: 30px;
+        }
+
+        .items-list h3 {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .items-list table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #FFFFFF;
+            min-width: 450px;
+        }
+
+        .items-list th,
+        .items-list td {
+            border: 1px solid #E5DAD0;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .items-list th {
+            background-color: #F8F1EA;
+            color: #4A3F35;
+            font-size: 15px;
+        }
+
+        .items-list td {
+            font-size: 15px;
+        }
+
+        .items-list tr:hover td {
+            background-color: #FCFAF7;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            background-color: #B77B55;
+            color: #FFFFFF;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #986342;
+        }
+
+        .btn-secondary {
+            background-color: #4A3F35;
+        }
+
+        .btn-secondary:hover {
+            background-color: #302820;
+        }
+
+        @media (max-width: 600px) {
+            .success-container {
+                width: 100%;
+                padding: 22px 15px;
+            }
+
+            .success-container h2 {
+                font-size: 23px;
+            }
+
+            .order-details {
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="success-container">
+
+    <div class="success-icon">🎉</div>
+
+    <h2>Your Order is Confirmed!</h2>
+
+    <p class="success-message">
+        Thank you for shopping with <strong>SmartCart</strong>.
+        Your order has been placed successfully.
+    </p>
+
+    <div class="order-details">
+
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+
+        <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
+
+        <p><strong>Amount Paid:</strong> ₹{{ order.amount }}</p>
+
+        <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+
+    </div>
+
+    <div class="items-list">
+
+        <h3>Order Summary</h3>
+
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price (₹)</th>
+                </tr>
+
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.product_name }}</td>
+                    <td>{{ it.quantity }}</td>
+                    <td>{{ it.price }}</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+
+    </div>
+
+    <div class="button-group">
+        <a href="/user/products" class="btn">
+            Continue Shopping →
+        </a>
+
+        <a href="/user/my-orders" class="btn btn-secondary">
+            View My Orders
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
