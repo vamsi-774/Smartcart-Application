@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,65 +169,67 @@
 
 <body>
 
-<div class="success-container">
+    <div class="success-container">
 
-    <div class="success-icon">🎉</div>
+        <div class="success-icon">🎉</div>
 
-    <h2>Your Order is Confirmed!</h2>
+        <h2>Your Order is Confirmed!</h2>
 
-    <p class="success-message">
-        Thank you for shopping with <strong>SmartCart</strong>.
-        Your order has been placed successfully.
-    </p>
+        <p class="success-message">
+            Thank you for shopping with <strong>SmartCart</strong>.
+            Your order has been placed successfully.
+        </p>
 
-    <div class="order-details">
+        <div class="order-details">
 
-        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
 
-        <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
+            <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
 
-        <p><strong>Amount Paid:</strong> ₹{{ order.amount }}</p>
+            <p><strong>Amount Paid:</strong> ₹{{ order.amount }}</p>
 
-        <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+            <p><strong>Order Date:</strong> {{ order.created_at }}</p>
 
-    </div>
+        </div>
 
-    <div class="items-list">
+        <div class="items-list">
 
-        <h3>Order Summary</h3>
+            <h3>Order Summary</h3>
 
-        <div class="table-wrapper">
-            <table>
-                <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price (₹)</th>
-                </tr>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price (₹)</th>
+                    </tr>
 
-                {% for it in items %}
-                <tr>
-                    <td>{{ it.product_name }}</td>
-                    <td>{{ it.quantity }}</td>
-                    <td>{{ it.price }}</td>
-                </tr>
-                {% endfor %}
+                    {% for it in items %}
+                    <tr>
+                        <td>{{ it.product_name }}</td>
+                        <td>{{ it.quantity }}</td>
+                        <td>{{ it.price }}</td>
+                    </tr>
+                    {% endfor %}
 
-            </table>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="button-group">
+            <a href="/user/products" class="btn">
+                Continue Shopping →
+            </a>
+
+            <a href="/user/my-orders" class="btn btn-secondary">
+                View My Orders
+            </a>
+            <a href="/user/download-invoice/{{ order.order_id }}" class="btn">Download Invoice (PDF)</a>
         </div>
 
     </div>
 
-    <div class="button-group">
-        <a href="/user/products" class="btn">
-            Continue Shopping →
-        </a>
-
-        <a href="/user/my-orders" class="btn btn-secondary">
-            View My Orders
-        </a>
-    </div>
-
-</div>
-
 </body>
+
 </html>
