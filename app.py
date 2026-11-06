@@ -1,30 +1,38 @@
-from flask import Flask, render_template, request, redirect, session, flash
-from flask_mail import Mail, Message
-import mysql.connector
-import bcrypt
-import random
-import config
 import os
-from werkzeug.utils import secure_filename
-from flask import request, jsonify, render_template
-import razorpay
+import random
+import smtplib
 import traceback
-from flask import make_response, render_template
+from email.message import EmailMessage
+
+import bcrypt
+import mysql.connector
+import razorpay
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_mail import Mail, Message
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+
+import config
 from utils.pdf_generator import generate_pdf
-
-
-
-
 
 app = Flask(__name__)
 
-# Set secret key for session management
+# App and session security
+app.config['SECRET_KEY'] = config.SECRET_KEY
 app.secret_key = config.SECRET_KEY
 
-# -------------------------------
-# MySQL Database Connection Setup
-# -------------------------------
-# ---------------- EMAIL CONFIGURATION ----------------
+# Flask-Mail configuration from config.py
 app.config['MAIL_SERVER'] = config.MAIL_SERVER
 app.config['MAIL_PORT'] = config.MAIL_PORT
 app.config['MAIL_USE_TLS'] = config.MAIL_USE_TLS
@@ -32,6 +40,50 @@ app.config['MAIL_USERNAME'] = config.MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
 
 mail = Mail(app)
+
+# Credentials for direct SMTP sending
+MAIL_ADDRESS = config.MAIL_USERNAME
+MAIL_PASSWORD = config.MAIL_PASSWORD
+
+# Token serializer for password reset
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
+def send_reset_email(receiver_email, reset_link):
+    if not MAIL_ADDRESS or not MAIL_PASSWORD:
+        raise RuntimeError("Email configuration is missing in config.py")
+
+    msg = EmailMessage()
+    msg['Subject'] = "Smart Cart - Password Reset"
+    msg['From'] = MAIL_ADDRESS
+    msg['To'] = receiver_email
+
+    msg.set_content(f"""Hello,
+
+We received a request to reset your Smart Cart password.
+
+Click the link below to reset your password:
+{reset_link}
+
+This link expires in 15 minutes.
+
+If you did not request a password reset, please ignore this email.
+
+Thank you,
+Smart Cart Team
+""")
+
+    # Connect to Gmail SMTP using port 587 and STARTTLS
+    with smtplib.SMTP(config.MAIL_SERVER, config.MAIL_PORT) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+        smtp.login(MAIL_ADDRESS, MAIL_PASSWORD)
+        smtp.send_message(msg)
+
+# -------------------------------
+# MySQL Database Connection Setup
+# -------------------------------
 
 
 # ---------------- DB CONNECTION FUNCTION --------------
@@ -802,6 +854,112 @@ def user_login():
 
     flash("Login successful!", "success")
     return redirect('/user-dashboard')
+
+
+
+@app.route('/user/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+
+    if request.method == 'POST':
+
+        email = request.form.get('email', '').strip().lower()
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute(
+            "SELECT user_id, email FROM users WHERE email = %s",
+            (email,)
+        )
+
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if user:
+            token = serializer.dumps(
+                email,
+                salt='password-reset'
+            )
+
+            reset_link = url_for(
+                'reset_password',
+                token=token,
+                _external=True
+            )
+
+            try:
+                send_reset_email(email, reset_link)
+
+            except Exception:
+                app.logger.exception("Could not send password reset email")
+                flash("Unable to send reset email. Please try again later.", "danger")
+                return redirect(url_for('forgot_password'))
+
+        # Same message whether email exists or not
+        flash(
+            "If that email is registered, a password reset link has been sent.",
+            "success"
+        )
+
+        return redirect(url_for('user_login'))
+
+    return render_template('user/forgot_password.html')
+
+
+@app.route('/user/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+
+    try:
+        email = serializer.loads(
+            token,
+            salt='password-reset',
+            max_age=900
+        )
+
+    except SignatureExpired:
+        flash("Your reset link has expired. Please request a new one.", "danger")
+        return redirect(url_for('forgot_password'))
+
+    except BadSignature:
+        flash("Invalid password reset link.", "danger")
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if len(password) < 8:
+            flash("Password must contain at least 8 characters.", "danger")
+            return render_template('user/reset_password.html')
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template('user/reset_password.html')
+
+        hashed_password = generate_password_hash(password)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "UPDATE users SET password = %s WHERE email = %s",
+            (hashed_password, email)
+        )
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        flash("Password reset successful. Please login.", "success")
+        return redirect(url_for('user_login'))
+
+    return render_template('user/reset_password.html')
+
+
 
 # ⭐ ROUTE 3: User Dashboard (Protected)
 # =================================================================
