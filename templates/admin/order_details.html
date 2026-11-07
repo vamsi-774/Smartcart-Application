@@ -1,0 +1,525 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order #{{ order.order_id }} Details - Admin</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+            color: #4A3F35;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            padding: 10px 17px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn {
+            background: #F8F1EA;
+            color: #986342;
+            border: 1px solid #EDE6DC;
+        }
+
+        .back-btn:hover {
+            background: #EDE6DC;
+        }
+
+        .logout-btn {
+            background: #B77B55;
+            color: #FFFFFF;
+        }
+
+        .logout-btn:hover {
+            background: #986342;
+            color: #FFFFFF;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            font-size: 27px;
+            font-weight: 750;
+        }
+
+        .order-number {
+            color: #B77B55;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: #EEF5EC;
+            color: #39734B;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Information Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .info-card,
+        .items-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.04);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            background: #F8F1EA;
+            border-bottom: 1px solid #EDE6DC;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        .info-row {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-row strong {
+            color: #4A3F35;
+        }
+
+        .info-row code {
+            color: #986342;
+            background: #F8F1EA;
+            padding: 4px 7px;
+            border-radius: 5px;
+            overflow-wrap: anywhere;
+        }
+
+        .total-amount {
+            margin-top: 20px;
+            padding: 14px;
+            background: #F8F1EA;
+            border-radius: 8px;
+            color: #986342;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        /* Purchased Items */
+        .items-card {
+            margin-top: 25px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        thead {
+            background: #F8F1EA;
+        }
+
+        th {
+            color: #4A3F35;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 16px 18px;
+            text-align: left;
+            border-bottom: 1px solid #EDE6DC;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #FCFAF7;
+        }
+
+        .product-image {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            background: #FAF8F3;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .product-name {
+            font-weight: 650;
+        }
+
+        .subtotal {
+            font-weight: 700;
+        }
+
+        .grand-total-row {
+            background: #F8F1EA;
+        }
+
+        .grand-total-row td {
+            font-weight: 800;
+            border-bottom: none;
+        }
+
+        .grand-total {
+            color: #986342;
+            font-size: 17px;
+        }
+
+        .no-image {
+            color: #999999;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            .nav-actions {
+                width: 100%;
+            }
+
+            .nav-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h2 {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-header {
+                font-size: 15px;
+                padding: 15px;
+            }
+
+            .card-body {
+                padding: 17px;
+            }
+
+            .info-row {
+                font-size: 13px;
+            }
+
+            .total-amount {
+                font-size: 17px;
+            }
+
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <a href="/admin-dashboard" class="logo">
+            Smart <span>Cart</span> Admin
+        </a>
+
+        <div class="nav-actions">
+            <a href="/admin/orders" class="nav-btn back-btn">
+                ← Back to Orders
+            </a>
+
+            <a href="/admin-logout" class="nav-btn logout-btn">
+                Logout
+            </a>
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <!-- Page Heading -->
+        <div class="page-heading">
+
+            <h2>
+                Order Details
+                <span class="order-number">#{{ order.order_id }}</span>
+            </h2>
+
+            <span class="status-badge">
+                {{ order.payment_status|upper }}
+            </span>
+
+        </div>
+
+
+        <!-- Customer and Payment Information -->
+        <div class="info-grid">
+
+            <!-- Customer Information -->
+            <div class="info-card">
+
+                <div class="card-header">
+                    Customer & Shipping Information
+                </div>
+
+                <div class="card-body">
+
+                    <p class="info-row">
+                        <strong>Receiver Name:</strong>
+                        {{ order.full_name }}
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Account Email:</strong>
+                        {{ order.user_email }}
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Mobile Number:</strong>
+                        {{ order.mobile }}
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Shipping Address:</strong>
+                        {{ order.delivery_address }}
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Pincode:</strong>
+                        {{ order.pincode }}
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Ordered On:</strong>
+                        {{ order.created_at }}
+                    </p>
+
+                </div>
+            </div>
+
+
+            <!-- Payment Information -->
+            <div class="info-card">
+
+                <div class="card-header">
+                    Payment Transaction Data
+                </div>
+
+                <div class="card-body">
+
+                    <p class="info-row">
+                        <strong>Razorpay Order ID:</strong>
+                        <code>{{ order.razorpay_order_id }}</code>
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Razorpay Payment ID:</strong>
+                        <code>{{ order.razorpay_payment_id }}</code>
+                    </p>
+
+                    <p class="info-row">
+                        <strong>Status:</strong>
+                        <span class="status-badge">
+                            {{ order.payment_status }}
+                        </span>
+                    </p>
+
+                    <div class="total-amount">
+                        Total Amount: ₹{{ "%.2f"|format(order.amount) }}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Purchased Items -->
+        <div class="items-card">
+
+            <div class="card-header">
+                Purchased Items
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Product Name</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th style="text-align: right;">Subtotal</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in items %}
+
+                        <tr>
+
+                            <td style="width: 85px;">
+
+                                {% if item.image %}
+
+                                <img
+                                    src="/static/uploads/product_images/{{ item.image }}"
+                                    alt="{{ item.product_name }}"
+                                    class="product-image"
+                                >
+
+                                {% else %}
+
+                                <span class="no-image">No Image</span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="product-name">
+                                {{ item.product_name }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(item.price) }}
+                            </td>
+
+                            <td>
+                                {{ item.quantity }}
+                            </td>
+
+                            <td class="subtotal" style="text-align: right;">
+                                ₹{{ "%.2f"|format(item.price * item.quantity) }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        <tr class="grand-total-row">
+
+                            <td colspan="4" style="text-align: right;">
+                                Grand Total:
+                            </td>
+
+                            <td class="grand-total" style="text-align: right;">
+                                ₹{{ "%.2f"|format(order.amount) }}
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

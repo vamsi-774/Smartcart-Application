@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Orders | Smart Cart Admin</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #FAF8F3;
+            color: #4A3F35;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #FFFFFF;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EDE6DC;
+            box-shadow: 0 3px 15px rgba(80, 60, 40, 0.04);
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+            color: #4A3F35;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: #C58B65;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-normal {
+            background: #F8F1EA;
+            color: #4A3F35;
+            border: 1px solid #EDE6DC;
+        }
+
+        .nav-normal:hover {
+            background: #EDE6DC;
+        }
+
+        .nav-active {
+            background: #B77B55;
+            color: #FFFFFF;
+        }
+
+        .nav-active:hover {
+            background: #986342;
+            color: #FFFFFF;
+        }
+
+        .logout-btn {
+            background: #4A3F35;
+            color: #FFFFFF;
+        }
+
+        .logout-btn:hover {
+            background: #302820;
+            color: #FFFFFF;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1250px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            font-size: 27px;
+            font-weight: 750;
+        }
+
+        .order-count {
+            background: #F8F1EA;
+            color: #986342;
+            border: 1px solid #EDE6DC;
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Flash Messages */
+        .flash-message {
+            padding: 13px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flash-success {
+            background: #EEF5EC;
+            color: #39734B;
+            border: 1px solid #D8E8D5;
+        }
+
+        .flash-danger,
+        .flash-error {
+            background: #FCECEC;
+            color: #A33B35;
+            border: 1px solid #F1D0CE;
+        }
+
+        .flash-warning {
+            background: #FFF5E5;
+            color: #93651C;
+            border: 1px solid #F0DFB9;
+        }
+
+        .flash-info {
+            background: #F8F1EA;
+            color: #986342;
+            border: 1px solid #EDE6DC;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 21px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Orders Card */
+        .orders-card {
+            background: #FFFFFF;
+            border: 1px solid #EDE6DC;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(80, 60, 40, 0.05);
+            overflow: hidden;
+        }
+
+        .card-heading {
+            padding: 20px 23px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #EDE6DC;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        /* Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 950px;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #F8F1EA;
+        }
+
+        th {
+            color: #4A3F35;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 17px 18px;
+            text-align: left;
+            border-bottom: 1px solid #EDE6DC;
+            font-size: 13px;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #FCFAF7;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .order-id {
+            color: #986342;
+            font-weight: 750;
+        }
+
+        .customer-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .customer-email {
+            color: #888888;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .amount {
+            color: #986342;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 30px;
+            background: #EEF5EC;
+            color: #39734B;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .date {
+            white-space: nowrap;
+            color: #777777;
+        }
+
+        .view-btn {
+            display: inline-block;
+            padding: 9px 14px;
+            background: #B77B55;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 650;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        .view-btn:hover {
+            background: #986342;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            color: #888888;
+            font-size: 14px;
+        }
+
+        .empty-icon {
+            display: block;
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                width: 100%;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-heading h2 {
+                font-size: 23px;
+            }
+
+            .card-heading {
+                padding: 17px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .nav-btn {
+                font-size: 11px;
+                padding: 9px 8px;
+            }
+
+            .page-heading h2 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <a class="logo" href="/admin-dashboard">
+            Smart <span>Cart</span> Admin
+        </a>
+
+        <div class="nav-links">
+
+            <a href="/admin-dashboard" class="nav-btn nav-normal">
+                Dashboard
+            </a>
+
+            <a href="/admin/item-list" class="nav-btn nav-normal">
+                Products
+            </a>
+
+            <a href="/admin/orders" class="nav-btn nav-active">
+                Orders
+            </a>
+
+            <a href="/admin-logout" class="nav-btn logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Heading -->
+        <div class="page-heading">
+
+            <h2>Customer Orders</h2>
+
+            <span class="order-count">
+                {{ orders|length }} Total Orders
+            </span>
+
+        </div>
+
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message flash-{{ category }}">
+
+                        <span>{{ message }}</span>
+
+                        <button type="button" class="close-btn"
+                            onclick="this.parentElement.remove()">
+                            &times;
+                        </button>
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- Orders Table -->
+        <div class="orders-card">
+
+            <div class="card-heading">
+                All Customer Orders
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer (Ordered By)</th>
+                            <th>Mobile</th>
+                            <th>Amount</th>
+                            <th>Payment Status</th>
+                            <th>Date & Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                        <tr>
+
+                            <td class="order-id">
+                                #{{ order.order_id }}
+                            </td>
+
+                            <td>
+                                <div class="customer-name">
+                                    {{ order.full_name }}
+                                </div>
+
+                                <div class="customer-email">
+                                    {{ order.user_email }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ order.mobile }}
+                            </td>
+
+                            <td class="amount">
+                                ₹{{ "%.2f"|format(order.amount) }}
+                            </td>
+
+                            <td>
+                                <span class="payment-status">
+                                    {{ order.payment_status|upper }}
+                                </span>
+                            </td>
+
+                            <td class="date">
+                                {{ order.created_at }}
+                            </td>
+
+                            <td>
+                                <a href="/admin/order/{{ order.order_id }}"
+                                   class="view-btn">
+                                    View Details →
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <span class="empty-icon">📦</span>
+                                No customer orders found yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

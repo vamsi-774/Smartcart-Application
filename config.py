@@ -1,9 +1,8 @@
-SECRET_KEY = "abc123" 
-DB_HOST = "localhost"
-DB_USER = "root"
-DB_PASSWORD = "2004"  # keep empty if no password
-DB_NAME = "smartcart"
+# import sqlite3
 
+# conn = sqlite3.connect("notes.db")
+
+SECRET_KEY = "abc123"
 
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 587
