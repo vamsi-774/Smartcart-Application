@@ -1042,22 +1042,13 @@ def user_address():
 
 
 # -----------------------------------------------------------------
-# ROUTE: ORDER REVIEW
+# ROUTE: ORDER REVIEW (Supports POST from address form & GET from payment back-link)
 # -----------------------------------------------------------------
-@app.route('/user/order-review', methods=['POST'])
+@app.route('/user/order-review', methods=['GET', 'POST'])
 def order_review():
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/user-login')
-
-    full_name = request.form.get('full_name')
-    mobile = request.form.get('mobile')
-    address = request.form.get('address')
-    pincode = request.form.get('pincode')
-
-    if not all([full_name, mobile, address, pincode]):
-        flash("Please fill all address details!", "danger")
-        return redirect('/user/address')
 
     cart = session.get('cart', {})
     selected_ids = session.get('selected_products', [])
@@ -1065,6 +1056,28 @@ def order_review():
     if not cart or not selected_ids:
         flash("Please select products before checkout!", "danger")
         return redirect('/user/cart')
+
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        mobile = request.form.get('mobile')
+        address = request.form.get('address')
+        pincode = request.form.get('pincode')
+
+        if not all([full_name, mobile, address, pincode]):
+            flash("Please fill all address details!", "danger")
+            return redirect('/user/address')
+
+        session['delivery_address'] = {
+            'full_name': full_name,
+            'mobile': mobile,
+            'address': address,
+            'pincode': pincode
+        }
+
+    # Verify delivery address exists when accessing via GET
+    if not session.get('delivery_address'):
+        flash("Please enter your delivery address first!", "warning")
+        return redirect('/user/address')
 
     order_items = []
     grand_total = 0
@@ -1090,13 +1103,6 @@ def order_review():
         flash("No valid products selected!", "danger")
         return redirect('/user/cart')
 
-    session['delivery_address'] = {
-        'full_name': full_name,
-        'mobile': mobile,
-        'address': address,
-        'pincode': pincode
-    }
-
     return render_template(
         "user/order_review.html",
         order_items=order_items,
@@ -1106,7 +1112,7 @@ def order_review():
 
 
 # -----------------------------------------------------------------
-# ROUTE: CREATE RAZORPAY ORDER
+# ROUTE: CREATE RAZORPAY ORDER (Only Selected Items)
 # -----------------------------------------------------------------
 @app.route('/user/pay', methods=['POST'])
 def user_pay():
@@ -1115,12 +1121,24 @@ def user_pay():
         return redirect('/user-login')
 
     cart = session.get('cart', {})
-    if not cart:
-        flash("Your cart is empty!", "danger")
-        return redirect('/user/products')
+    selected_ids = session.get('selected_products', [])
 
-    total_amount = sum(item['price'] * item['quantity'] for item in cart.values())
-    razorpay_amount = int(total_amount * 100)
+    if not cart or not selected_ids:
+        flash("Please select products before checkout!", "danger")
+        return redirect('/user/cart')
+
+    # Calculate total strictly for selected products
+    total_amount = sum(
+        float(cart[str(pid)]['price']) * int(cart[str(pid)]['quantity'])
+        for pid in selected_ids
+        if str(pid) in cart
+    )
+
+    if total_amount <= 0:
+        flash("Invalid order total.", "danger")
+        return redirect('/user/cart')
+
+    razorpay_amount = int(round(total_amount * 100))
 
     razorpay_order = razorpay_client.order.create({
         "amount": razorpay_amount,
@@ -1147,7 +1165,6 @@ def verify_payment():
         flash("Please login to complete the payment.", "danger")
         return redirect('/user-login')
 
-    # Read Razorpay POST parameters
     razorpay_payment_id = request.form.get('razorpay_payment_id')
     razorpay_order_id = request.form.get('razorpay_order_id')
     razorpay_signature = request.form.get('razorpay_signature')
@@ -1156,7 +1173,6 @@ def verify_payment():
         flash("Payment verification failed (missing data).", "danger")
         return redirect('/user/cart')
 
-    # Verify signature
     payload = {
         'razorpay_order_id': razorpay_order_id,
         'razorpay_payment_id': razorpay_payment_id,
@@ -1173,22 +1189,27 @@ def verify_payment():
     user_id = session['user_id']
     cart = session.get('cart', {})
     delivery = session.get('delivery_address')
+    selected_ids = session.get('selected_products', [])
 
-    if not cart:
-        flash("Cart is empty. Cannot create order.", "danger")
-        return redirect('/user/products')
+    if not cart or not selected_ids:
+        flash("Cart or selected items not found.", "danger")
+        return redirect('/user/cart')
 
     if not delivery:
         flash("Delivery address not found. Please try checkout again.", "danger")
         return redirect('/user/address')
 
-    total_amount = sum(item['price'] * item['quantity'] for item in cart.values())
+    # Calculate total strictly for the items that were paid for
+    total_amount = sum(
+        float(cart[str(pid)]['price']) * int(cart[str(pid)]['quantity'])
+        for pid in selected_ids
+        if str(pid) in cart
+    )
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        # Insert main order
         cursor.execute("""
             INSERT INTO orders (
                 user_id,
@@ -1216,29 +1237,31 @@ def verify_payment():
 
         order_db_id = cursor.lastrowid
 
-        # Insert line items
-        for pid_str, item in cart.items():
-            product_id = int(pid_str)
-            cursor.execute("""
-                INSERT INTO order_items (
-                    order_id,
-                    product_id,
-                    product_name,
-                    quantity,
-                    price
-                )
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                order_db_id,
-                product_id,
-                item['name'],
-                item['quantity'],
-                item['price']
-            ))
+        # Insert only the selected products as order items
+        for pid in selected_ids:
+            pid_str = str(pid)
+            if pid_str in cart:
+                item = cart[pid_str]
+                cursor.execute("""
+                    INSERT INTO order_items (
+                        order_id,
+                        product_id,
+                        product_name,
+                        quantity,
+                        price
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    order_db_id,
+                    int(pid),
+                    item['name'],
+                    int(item['quantity']),
+                    float(item['price'])
+                ))
 
         conn.commit()
 
-        # Generate & send PDF invoice via email
+        # Send invoice email
         try:
             cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_db_id,))
             order_data = cursor.fetchone()
@@ -1255,8 +1278,11 @@ def verify_payment():
         except Exception as mail_err:
             app.logger.error("Failed to generate or send invoice email: %s", str(mail_err))
 
-        # Clear session
-        session.pop('cart', None)
+        # Remove ONLY the purchased products from the user's cart
+        for pid in selected_ids:
+            cart.pop(str(pid), None)
+
+        session['cart'] = cart
         session.pop('razorpay_order_id', None)
         session.pop('delivery_address', None)
         session.pop('selected_products', None)
@@ -1273,7 +1299,6 @@ def verify_payment():
     finally:
         cursor.close()
         conn.close()
-
 
 # -----------------------------------------------------------------
 # ROUTE: ORDER SUCCESS

@@ -12,5 +12,5 @@ MAIL_PASSWORD = 'wxqofzfnpefbvzil'
 
 
 
-RAZORPAY_KEY_ID = "rzp_test_TvOBfidVvQriLY" # rzp_test_TLeM6Ox9b7K9Dp
-RAZORPAY_KEY_SECRET = "CBQov7hwjP1y0orXGI4DVkMV" #dU4b4haEuqjJU1pc61pvF0UE
+RAZORPAY_KEY_ID = "rzp_live_TxL848prrzeu0M" # rzp_test_TLeM6Ox9b7K9Dp
+RAZORPAY_KEY_SECRET = "v0zFHczTrc9pqpZGRUc854C7" #dU4b4haEuqjJU1pc61pvF0UE
