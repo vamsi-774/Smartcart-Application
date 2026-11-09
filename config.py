@@ -1,6 +1,13 @@
 # import sqlite3
 
 # conn = sqlite3.connect("notes.db")
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
 
 SECRET_KEY = "abc123"
 
@@ -12,5 +19,4 @@ MAIL_PASSWORD = 'wxqofzfnpefbvzil'
 
 
 
-RAZORPAY_KEY_ID = "rzp_live_TxL848prrzeu0M" # rzp_test_TLeM6Ox9b7K9Dp
-RAZORPAY_KEY_SECRET = "v0zFHczTrc9pqpZGRUc854C7" #dU4b4haEuqjJU1pc61pvF0UE
+
